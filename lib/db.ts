@@ -121,3 +121,23 @@ export function getSubscriberCount(): number {
     .get() as { count: number };
   return result.count;
 }
+
+export function getAllActiveSubscribers(): string[] {
+  const database = getDb();
+  const rows = database
+    .prepare(
+      "SELECT email FROM subscribers WHERE unsubscribed_at IS NULL ORDER BY created_at"
+    )
+    .all() as Array<{ email: string }>;
+  return rows.map((row) => row.email);
+}
+
+export function unsubscribeByEmail(email: string): boolean {
+  const database = getDb();
+  const result = database
+    .prepare(
+      "UPDATE subscribers SET unsubscribed_at = datetime('now') WHERE email = ? AND unsubscribed_at IS NULL"
+    )
+    .run(email);
+  return result.changes > 0;
+}
