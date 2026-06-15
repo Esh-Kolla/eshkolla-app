@@ -29,7 +29,9 @@ const COMMANDS: Record<string, string> = {
   blog         — read my AI/ML journal
   resume       — view LinkedIn
   sudo hire-me — try it ;)
-  clear        — clear terminal`,
+  clear        — clear terminal
+
+Or just ask me anything — I have AI superpowers.`,
 
   about: `Eshwar Kolla — Cofounder & CTO at Alvva.
 
@@ -141,6 +143,7 @@ Permission granted.
 interface HistoryEntry {
   command: string;
   output: string;
+  isThinking?: boolean;
 }
 
 export default function CommandInput() {
@@ -148,6 +151,10 @@ export default function CommandInput() {
   const [history, setHistory] = useState<HistoryEntry[]>([]);
   const [cmdHistory, setCmdHistory] = useState<string[]>([]);
   const [historyIndex, setHistoryIndex] = useState(-1);
+  const [aiHistory, setAiHistory] = useState<
+    Array<{ role: "user" | "assistant"; content: string }>
+  >([]);
+  const [isStreaming, setIsStreaming] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
 
@@ -157,8 +164,80 @@ export default function CommandInput() {
     }
   }, [history]);
 
+  async function handleAIChat(message: string) {
+    setIsStreaming(true);
+
+    // Add user message with a thinking indicator
+    setHistory((prev) => [
+      ...prev,
+      { command: message, output: "", isThinking: true },
+    ]);
+
+    try {
+      const response = await fetch("/api/chat", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ message, history: aiHistory }),
+      });
+
+      if (!response.ok || !response.body) {
+        throw new Error("AI request failed");
+      }
+
+      const reader = response.body.getReader();
+      const decoder = new TextDecoder();
+      let fullText = "";
+
+      while (true) {
+        const { done, value } = await reader.read();
+        if (done) break;
+
+        const chunk = decoder.decode(value, { stream: true });
+        fullText += chunk;
+
+        const currentText = fullText;
+        setHistory((prev) => {
+          const updated = [...prev];
+          updated[updated.length - 1] = {
+            command: message,
+            output: currentText,
+            isThinking: false,
+          };
+          return updated;
+        });
+      }
+
+      // Add to AI conversation history (cap at 20 turns)
+      setAiHistory((prev) => {
+        const updated = [
+          ...prev,
+          { role: "user" as const, content: message },
+          { role: "assistant" as const, content: fullText },
+        ];
+        return updated.slice(-20);
+      });
+    } catch {
+      setHistory((prev) => {
+        const updated = [...prev];
+        updated[updated.length - 1] = {
+          command: message,
+          output:
+            "AI systems offline. Try a built-in command — type 'help' for the list.",
+          isThinking: false,
+        };
+        return updated;
+      });
+    } finally {
+      setIsStreaming(false);
+      // Re-focus the input after streaming completes
+      setTimeout(() => inputRef.current?.focus(), 0);
+    }
+  }
+
   function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
+    if (isStreaming) return;
+
     const cmd = input.trim().toLowerCase();
     if (!cmd) return;
 
@@ -191,11 +270,16 @@ export default function CommandInput() {
       return;
     }
 
-    const output =
-      COMMANDS[cmd] || `command not found: ${cmd}. Type 'help' for available commands.`;
+    // Check if it's a built-in command
+    if (COMMANDS[cmd]) {
+      setHistory((prev) => [...prev, { command: cmd, output: COMMANDS[cmd] }]);
+      setInput("");
+      return;
+    }
 
-    setHistory((prev) => [...prev, { command: cmd, output }]);
+    // Unknown command — send to AI chatbot
     setInput("");
+    handleAIChat(cmd);
   }
 
   function handleKeyDown(e: React.KeyboardEvent) {
@@ -242,9 +326,16 @@ export default function CommandInput() {
               <span className="text-accent">$</span>{" "}
               <span className="text-foreground">{entry.command}</span>
             </div>
-            <pre className="text-muted whitespace-pre-wrap mt-1 text-xs leading-relaxed">
-              {entry.output}
-            </pre>
+            {entry.isThinking ? (
+              <pre className="text-muted whitespace-pre-wrap mt-1 text-xs leading-relaxed">
+                <span className="text-dim">[thinking...]</span>
+                <span className="cursor-blink" />
+              </pre>
+            ) : (
+              <pre className="text-muted whitespace-pre-wrap mt-1 text-xs leading-relaxed">
+                {entry.output}
+              </pre>
+            )}
           </div>
         ))}
 
@@ -256,9 +347,10 @@ export default function CommandInput() {
             value={input}
             onChange={(e) => setInput(e.target.value)}
             onKeyDown={handleKeyDown}
-            className="flex-1 bg-transparent text-foreground outline-none caret-foreground"
+            className="flex-1 bg-transparent text-foreground outline-none caret-foreground disabled:opacity-50"
             autoComplete="off"
             spellCheck={false}
+            disabled={isStreaming}
             aria-label="Terminal command input"
           />
         </form>
