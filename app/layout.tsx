@@ -3,6 +3,7 @@ import { JetBrains_Mono } from "next/font/google";
 import Nav from "@/components/nav";
 import MatrixRain from "@/components/matrix-rain";
 import BootSequence from "@/components/boot-sequence";
+import PageTracker from "@/components/page-tracker";
 import { SITE_URL, BIO } from "@/lib/data/bio";
 import "./globals.css";
 
@@ -57,6 +58,7 @@ export default function RootLayout({
       </head>
       <body className="min-h-full flex flex-col font-mono bg-background text-foreground">
         <BootSequence>
+          <PageTracker />
           <MatrixRain />
           <div className="scanlines" />
           <Nav />

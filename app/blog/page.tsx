@@ -1,5 +1,6 @@
 import { getAllPosts } from "@/lib/posts";
 import PostCard from "@/components/post-card";
+import NewsletterSignup from "@/components/newsletter-signup";
 import { SITE_URL, BIO } from "@/lib/data/bio";
 
 export const metadata = {
@@ -47,6 +48,8 @@ export default function BlogPage() {
           ))}
         </div>
       )}
+
+      <NewsletterSignup />
     </div>
   );
 }
