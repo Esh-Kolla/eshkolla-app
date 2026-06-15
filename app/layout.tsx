@@ -1,8 +1,7 @@
 import type { Metadata } from "next";
 import { JetBrains_Mono } from "next/font/google";
-import Nav from "@/components/nav";
-import MatrixRain from "@/components/matrix-rain";
 import BootSequence from "@/components/boot-sequence";
+import Desktop from "@/components/desktop";
 import PageTracker from "@/components/page-tracker";
 import { SITE_URL, BIO } from "@/lib/data/bio";
 import "./globals.css";
@@ -59,16 +58,11 @@ export default function RootLayout({
       <body className="min-h-full flex flex-col font-mono bg-background text-foreground">
         <BootSequence>
           <PageTracker />
-          <MatrixRain />
-          <div className="scanlines" />
-          <Nav />
-          <main className="flex-1 max-w-3xl w-full mx-auto px-6 py-10 relative z-10">
-            {children}
-          </main>
-          <footer className="border-t border-terminal-border py-4 text-center text-xs text-dim relative z-10">
-            <span className="text-muted">$</span> echo &quot;built by eshwar
-            kolla&quot;
-          </footer>
+          <Desktop>
+            <main className="flex-1 max-w-3xl w-full mx-auto px-6 py-16 pb-24 relative">
+              {children}
+            </main>
+          </Desktop>
         </BootSequence>
       </body>
     </html>

@@ -3,16 +3,16 @@
 import { useState, useEffect, useCallback } from "react";
 
 const BOOT_LINES = [
-  { text: "[BIOS] Eshwar Kolla Personal System v2.0", color: "text-foreground" },
-  { text: "[OK] Loading kernel modules...", color: "text-muted" },
-  { text: "[OK] Initializing neural networks...", color: "text-muted" },
-  { text: "[OK] Mounting /dev/ambition...", color: "text-muted" },
-  { text: "[OK] Starting AI/ML subsystems...", color: "text-muted" },
-  { text: "[OK] Validating 3 degrees...", color: "text-muted" },
-  { text: "[OK] Connecting to alvva.co...", color: "text-muted" },
+  { text: "[BIOS] macOS Eshwar v14.0", color: "text-foreground" },
+  { text: "[OK] Loading kernel...", color: "text-muted" },
+  { text: "[OK] Starting WindowServer...", color: "text-muted" },
+  { text: "[OK] Loading Finder...", color: "text-muted" },
+  { text: "[OK] Mounting /dev/projects...", color: "text-muted" },
+  { text: "[OK] Starting AI subsystems...", color: "text-muted" },
   { text: "[OK] Loading 12+ years of experience...", color: "text-muted" },
+  { text: "[OK] Connecting to alvva.co...", color: "text-muted" },
   { text: "", color: "" },
-  { text: "[READY] System online. Welcome.", color: "text-foreground text-glow" },
+  { text: "[READY] Desktop ready. Welcome.", color: "text-foreground text-glow" },
 ];
 
 export default function BootSequence({
