@@ -1,0 +1,38 @@
+---
+title: "Why Attention Is All You Need"
+date: "2026-06-15"
+summary: "The transformer architecture changed everything. Here's why self-attention was the breakthrough that made modern AI possible."
+tags: ["transformers", "attention", "deep-learning"]
+---
+
+The 2017 paper "Attention Is All You Need" didn't just introduce a new architecture — it redefined what was possible in AI.
+
+## The Problem Before Transformers
+
+RNNs and LSTMs processed sequences step by step. This meant:
+
+- **Slow training** — you couldn't parallelize sequential processing
+- **Vanishing gradients** — long-range dependencies got lost
+- **Bottleneck** — the entire input had to compress into a fixed-size vector
+
+## What Self-Attention Changed
+
+Self-attention lets every token in a sequence attend to every other token *simultaneously*. Instead of reading a sentence word by word, the model sees everything at once and decides what matters.
+
+```
+Attention(Q, K, V) = softmax(QK^T / √d_k) V
+```
+
+Three simple matrix multiplications. That's it. No recurrence, no convolutions.
+
+## Why It Worked
+
+1. **Parallelization** — every position computes independently, so you can throw GPUs at it
+2. **Long-range dependencies** — token 1 can directly attend to token 1000
+3. **Scalability** — more data + more compute = better performance (scaling laws)
+
+## The Ripple Effect
+
+Transformers gave us GPT, BERT, and every large language model since. They've expanded beyond NLP into vision (ViT), audio, protein folding, and more.
+
+The lesson: sometimes the right *simplification* is more powerful than the right *complication*.
