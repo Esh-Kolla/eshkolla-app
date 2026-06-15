@@ -47,6 +47,14 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" className={`${jetbrainsMono.variable} h-full`}>
+      <head>
+        <link
+          rel="alternate"
+          type="application/rss+xml"
+          title={`AI/ML Journal — ${BIO.name}`}
+          href="/feed.xml"
+        />
+      </head>
       <body className="min-h-full flex flex-col font-mono bg-background text-foreground">
         <BootSequence>
           <MatrixRain />
