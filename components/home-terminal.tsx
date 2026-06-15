@@ -37,7 +37,8 @@ export default function HomeTerminal() {
           {step >= 1 && (
             <div className="ml-4 text-[#cccccc]">
               <p>
-                <strong className="text-foreground">{BIO.name}</strong> — {BIO.title} at{" "}
+                <strong className="text-foreground">{BIO.name}</strong>{" "}
+                <span className="text-sm">🇮🇳 🇺🇸</span> — {BIO.title} at{" "}
                 <a
                   href={BIO.companyUrl}
                   target="_blank"

@@ -8,7 +8,8 @@ const NEOFETCH = `
   │  ─────────────                    │
   │  OS: Builder Linux 3.0            │
   │  Role: Cofounder & CTO @ Alvva    │
-  │  Location: Palo Alto, CA          │
+  │  Location: Palo Alto, CA 🇺🇸       │
+  │  From: India 🇮🇳                   │
   │  Uptime: 12+ years               │
   │  Education: Harrisburg (MS DS&ML) │
   │  Shell: /bin/build                │
