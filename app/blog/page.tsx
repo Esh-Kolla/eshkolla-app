@@ -1,5 +1,5 @@
 import { getAllPosts } from "@/lib/posts";
-import PostCard from "@/components/post-card";
+import BlogList from "@/components/blog-list";
 import NewsletterSignup from "@/components/newsletter-signup";
 import { SITE_URL, BIO } from "@/lib/data/bio";
 
@@ -42,11 +42,7 @@ export default function BlogPage() {
           <p className="text-dim text-xs mt-4 cursor-blink">_</p>
         </div>
       ) : (
-        <div className="space-y-4">
-          {posts.map((post) => (
-            <PostCard key={post.slug} {...post} />
-          ))}
-        </div>
+        <BlogList posts={posts} />
       )}
 
       <NewsletterSignup />

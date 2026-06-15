@@ -2,6 +2,9 @@ import { notFound } from "next/navigation";
 import { MDXRemote } from "next-mdx-remote/rsc";
 import { getPostBySlug, getAllSlugs } from "@/lib/posts";
 import TerminalWindow from "@/components/terminal-window";
+import ReadingProgress from "@/components/reading-progress";
+import TableOfContents from "@/components/table-of-contents";
+import RelatedPosts from "@/components/related-posts";
 import JsonLd from "@/components/json-ld";
 import { SITE_URL, BIO } from "@/lib/data/bio";
 import Link from "next/link";
@@ -67,6 +70,7 @@ export default async function PostPage({
 
   return (
     <div>
+      <ReadingProgress />
       <JsonLd data={postLd} />
       <Link
         href="/blog"
@@ -98,10 +102,14 @@ export default async function PostPage({
           )}
         </div>
 
+        <TableOfContents />
+
         <div className="prose-terminal">
           <MDXRemote source={post.content} />
         </div>
       </TerminalWindow>
+
+      <RelatedPosts currentSlug={slug} currentTags={post.tags} />
     </div>
   );
 }
