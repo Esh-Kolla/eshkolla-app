@@ -59,9 +59,7 @@ export default function RootLayout({
         <BootSequence>
           <PageTracker />
           <Desktop>
-            <main className="flex-1 max-w-3xl w-full mx-auto px-6 py-16 pb-24 relative">
-              {children}
-            </main>
+            {children}
           </Desktop>
         </BootSequence>
       </body>
