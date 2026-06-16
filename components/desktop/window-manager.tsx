@@ -198,3 +198,11 @@ export function useWindowManager(): WindowManagerContextValue {
   }
   return ctx;
 }
+
+/**
+ * Safe variant that returns null when used outside a WindowManagerProvider.
+ * Useful for components like the dock that may render on pages without the provider.
+ */
+export function useWindowManagerSafe(): WindowManagerContextValue | null {
+  return useContext(WindowManagerContext);
+}
