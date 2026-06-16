@@ -1,7 +1,6 @@
 import { notFound } from "next/navigation";
 import { MDXRemote } from "next-mdx-remote/rsc";
 import { getPostBySlug, getAllSlugs } from "@/lib/posts";
-import TerminalWindow from "@/components/terminal-window";
 import ReadingProgress from "@/components/reading-progress";
 import TableOfContents from "@/components/table-of-contents";
 import RelatedPosts from "@/components/related-posts";
@@ -79,35 +78,33 @@ export default async function PostPage({
         <span className="text-accent">$</span> cd ../
       </Link>
 
-      <TerminalWindow title={`cat ${slug}.mdx`}>
-        <div className="mb-6">
-          <h1 className="text-foreground text-glow text-xl font-bold mb-2">
-            {post.title}
-          </h1>
-          <div className="flex items-center gap-4 text-xs text-dim">
-            <span>{post.date}</span>
-            <span>{post.readingTime}</span>
+      <div className="mb-6">
+        <h1 className="text-foreground text-glow text-xl font-bold mb-2">
+          {post.title}
+        </h1>
+        <div className="flex items-center gap-4 text-xs text-dim">
+          <span>{post.date}</span>
+          <span>{post.readingTime}</span>
+        </div>
+        {post.tags.length > 0 && (
+          <div className="flex gap-2 mt-3 flex-wrap">
+            {post.tags.map((tag) => (
+              <span
+                key={tag}
+                className="text-xs px-2 py-0.5 rounded border border-terminal-border text-dim"
+              >
+                {tag}
+              </span>
+            ))}
           </div>
-          {post.tags.length > 0 && (
-            <div className="flex gap-2 mt-3 flex-wrap">
-              {post.tags.map((tag) => (
-                <span
-                  key={tag}
-                  className="text-xs px-2 py-0.5 rounded border border-terminal-border text-dim"
-                >
-                  {tag}
-                </span>
-              ))}
-            </div>
-          )}
-        </div>
+        )}
+      </div>
 
-        <TableOfContents />
+      <TableOfContents />
 
-        <div className="prose-terminal">
-          <MDXRemote source={post.content} />
-        </div>
-      </TerminalWindow>
+      <div className="prose-terminal">
+        <MDXRemote source={post.content} />
+      </div>
 
       <RelatedPosts currentSlug={slug} currentTags={post.tags} />
     </div>

@@ -37,6 +37,7 @@ function WindowInner({
 
   const [dragging, setDragging] = useState(false);
   const [mounted, setMounted] = useState(false);
+  const [isMobile, setIsMobile] = useState(false);
 
   // Store drag origin so we can compute deltas without re-renders per-move
   const dragOrigin = useRef<{
@@ -45,6 +46,14 @@ function WindowInner({
     windowX: number;
     windowY: number;
   } | null>(null);
+
+  // Detect mobile screen size
+  useEffect(() => {
+    const checkMobile = () => setIsMobile(window.innerWidth < 768);
+    checkMobile();
+    window.addEventListener("resize", checkMobile);
+    return () => window.removeEventListener("resize", checkMobile);
+  }, []);
 
   // Trigger mount animation
   useEffect(() => {
@@ -60,11 +69,12 @@ function WindowInner({
 
   const isFocused = focusedWindowId === windowId;
 
-  // Position & size — maximized overrides stored values
-  const posX = win.isMaximized ? 0 : win.position.x;
-  const posY = win.isMaximized ? 0 : win.position.y;
-  const width = win.isMaximized ? "100%" : win.size.width;
-  const height = win.isMaximized
+  // Position & size — maximized or mobile overrides stored values
+  const shouldFill = win.isMaximized || isMobile;
+  const posX = shouldFill ? 0 : win.position.x;
+  const posY = shouldFill ? 0 : win.position.y;
+  const width = shouldFill ? "100%" : win.size.width;
+  const height = shouldFill
     ? "calc(100vh - 28px - 70px)"
     : win.size.height;
 
@@ -73,7 +83,7 @@ function WindowInner({
   // ---------------------------------------------------------------------------
 
   function handlePointerDown(e: React.PointerEvent<HTMLDivElement>) {
-    if (win.isMaximized) return;
+    if (win.isMaximized || isMobile) return;
 
     dragOrigin.current = {
       pointerX: e.clientX,
@@ -146,7 +156,7 @@ function WindowInner({
         className={`
           flex items-center h-9 px-3 shrink-0
           bg-[#2a2a2a]/95 backdrop-blur-md border-b border-white/10
-          ${win.isMaximized ? "" : dragging ? "cursor-grabbing" : "cursor-grab"}
+          ${shouldFill ? "" : dragging ? "cursor-grabbing" : "cursor-grab"}
           select-none
         `}
         onPointerDown={handlePointerDown}

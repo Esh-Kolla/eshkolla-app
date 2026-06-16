@@ -35,7 +35,7 @@ export default function Desktop({
             className="flex-1 relative"
             style={{ background: SONOMA_WALLPAPER }}
           >
-            <div className="max-w-3xl w-full mx-auto px-6 py-16 pb-24 relative z-10">
+            <div className="max-w-3xl w-full mx-auto px-2 py-8 pb-20 md:px-6 md:py-16 md:pb-24 relative z-10">
               <div className="rounded-xl border border-white/10 bg-[#1a1a1a] shadow-2xl overflow-hidden">
                 <div className="flex items-center gap-2 px-4 py-2 bg-[#2a2a2a]/95 backdrop-blur-md border-b border-white/10">
                   <div className="flex gap-1.5">
@@ -44,7 +44,7 @@ export default function Desktop({
                     <div className="w-3 h-3 rounded-full bg-[#28c840]" />
                   </div>
                 </div>
-                <div className="p-6">{children}</div>
+                <div className="p-4 md:p-6">{children}</div>
               </div>
             </div>
           </div>

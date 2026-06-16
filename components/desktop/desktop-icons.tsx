@@ -134,7 +134,7 @@ export default function DesktopIcons() {
 
   return (
     <div
-      className="absolute right-6 top-14 flex flex-col gap-4"
+      className="absolute right-6 top-14 hidden md:flex flex-col gap-4"
       onClick={() => setSelectedId(null)}
     >
       {ICONS.map((icon) => {

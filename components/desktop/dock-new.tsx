@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useRef, useState, type MouseEvent } from "react";
+import { useCallback, useEffect, useRef, useState, type MouseEvent } from "react";
 import { useWindowManagerSafe, type WindowState } from "./window-manager";
 
 // ---------------------------------------------------------------------------
@@ -134,6 +134,15 @@ export default function DockNew() {
   const [mouseX, setMouseX] = useState<number | null>(null);
   const [hoveredId, setHoveredId] = useState<string | null>(null);
   const [bouncingId, setBouncingId] = useState<string | null>(null);
+  const [isMobile, setIsMobile] = useState(false);
+
+  // Detect mobile screen size
+  useEffect(() => {
+    const checkMobile = () => setIsMobile(window.innerWidth < 768);
+    checkMobile();
+    window.addEventListener("resize", checkMobile);
+    return () => window.removeEventListener("resize", checkMobile);
+  }, []);
 
   // Safe window manager access — returns null when no provider is present
   const wm = useWindowManagerSafe();
@@ -183,9 +192,10 @@ export default function DockNew() {
   );
 
   // Calculate parabolic magnification scale for a given icon index
+  // Disabled on mobile — icons stay at base scale
   const getScale = useCallback(
     (iconIndex: number): number => {
-      if (mouseX === null) return 1;
+      if (isMobile || mouseX === null) return 1;
 
       // Calculate icon center X position within the dock container
       // Account for container padding (px-2 = 8px)
@@ -194,7 +204,7 @@ export default function DockNew() {
 
       return 1 + 0.7 * Math.max(0, 1 - distance / 2.5);
     },
-    [mouseX],
+    [mouseX, isMobile],
   );
 
   // Track icon index across the render loop (separator doesn't count)
@@ -210,10 +220,10 @@ export default function DockNew() {
         }
       `}</style>
 
-      <div className="fixed bottom-3 left-1/2 -translate-x-1/2 z-40">
+      <div className="fixed bottom-3 left-1/2 -translate-x-1/2 z-40 max-w-[calc(100vw-16px)]">
         <div
           ref={dockRef}
-          className="flex items-end gap-1 px-2 py-1.5 bg-white/10 backdrop-blur-2xl rounded-2xl border border-white/20 shadow-2xl"
+          className="flex items-end gap-1 px-2 py-1.5 bg-white/10 backdrop-blur-2xl rounded-2xl border border-white/20 shadow-2xl overflow-x-auto"
           onMouseMove={handleMouseMove}
           onMouseLeave={handleMouseLeave}
         >
@@ -258,7 +268,7 @@ export default function DockNew() {
                 {/* Icon with magnification + bounce */}
                 <div
                   style={{
-                    transform: `scale(${scale})`,
+                    transform: `scale(${isMobile ? 0.8 * scale : scale})`,
                     transformOrigin: "bottom",
                     transition: "transform 0.1s ease-out",
                     animation: isBouncing

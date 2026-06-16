@@ -35,13 +35,13 @@ export default function MenuBar() {
       <div className="flex items-center gap-4">
         <span className="text-sm font-semibold"></span>
         <span className="font-semibold">{activeApp}</span>
-        <span className="text-[#e0e0e0]/70 hover:text-[#e0e0e0] cursor-default">
+        <span className="hidden md:inline text-[#e0e0e0]/70 hover:text-[#e0e0e0] cursor-default">
           File
         </span>
-        <span className="text-[#e0e0e0]/70 hover:text-[#e0e0e0] cursor-default">
+        <span className="hidden md:inline text-[#e0e0e0]/70 hover:text-[#e0e0e0] cursor-default">
           Edit
         </span>
-        <span className="text-[#e0e0e0]/70 hover:text-[#e0e0e0] cursor-default">
+        <span className="hidden md:inline text-[#e0e0e0]/70 hover:text-[#e0e0e0] cursor-default">
           View
         </span>
       </div>
@@ -56,7 +56,7 @@ export default function MenuBar() {
           strokeWidth="2"
           strokeLinecap="round"
           strokeLinejoin="round"
-          className="opacity-70"
+          className="hidden md:block opacity-70"
         >
           <path d="M5 12.55a11 11 0 0 1 14.08 0" />
           <path d="M1.42 9a16 16 0 0 1 21.16 0" />
@@ -71,7 +71,7 @@ export default function MenuBar() {
           fill="none"
           stroke="currentColor"
           strokeWidth="1.5"
-          className="opacity-70"
+          className="hidden md:block opacity-70"
         >
           <rect x="1" y="1" width="22" height="12" rx="2" />
           <rect
