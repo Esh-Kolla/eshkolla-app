@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState, type ReactNode } from "react";
 import { useWindowManager, type WindowState } from "./window-manager";
+import { isOverTrash } from "./trash";
 
 // ---------------------------------------------------------------------------
 // Props
@@ -108,6 +109,11 @@ function WindowInner({
     setDragging(false);
     dragOrigin.current = null;
     (e.target as HTMLElement).releasePointerCapture(e.pointerId);
+
+    // Check if the window was dropped on the trash zone
+    if (isOverTrash(e.clientX, e.clientY)) {
+      closeWindow(windowId);
+    }
   }
 
   // ---------------------------------------------------------------------------
