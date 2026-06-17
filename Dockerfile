@@ -1,6 +1,6 @@
-# Stage 1: Install dependencies
+# Stage 1: Install dependencies + build native addons
 FROM node:20-alpine AS deps
-RUN apk add --no-cache libc6-compat
+RUN apk add --no-cache libc6-compat python3 make g++
 WORKDIR /app
 
 COPY package.json package-lock.json* ./
@@ -8,15 +8,10 @@ RUN npm ci
 
 # Stage 2: Build the application
 FROM node:20-alpine AS builder
-# Install build tools for native addons (better-sqlite3)
-RUN apk add --no-cache python3 make g++
 WORKDIR /app
 
 COPY --from=deps /app/node_modules ./node_modules
 COPY . .
-
-# Rebuild better-sqlite3 for the target platform
-RUN npm rebuild better-sqlite3
 
 RUN npm run build
 

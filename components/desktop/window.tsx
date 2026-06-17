@@ -36,7 +36,7 @@ function WindowInner({
   } = useWindowManager();
 
   const [dragging, setDragging] = useState(false);
-  const [mounted, setMounted] = useState(false);
+  const [mounted, setMounted] = useState(true);
   const [isMobile, setIsMobile] = useState(false);
 
   // Store drag origin so we can compute deltas without re-renders per-move

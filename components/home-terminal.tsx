@@ -176,7 +176,7 @@ function TerminalInner({
           <div className="mt-4">
             <span className="text-accent">$</span>{" "}
             <TypingEffect
-              text="tail -f ai-journal.log"
+              text="cat interests.txt"
               speed={60}
               delay={300}
               onDone={() => setStep(5)}
@@ -185,6 +185,33 @@ function TerminalInner({
         )}
 
         {step >= 5 && (
+          <div className="ml-4 mt-1 space-y-3">
+            {BIO.interests.map((interest) => (
+              <div key={interest.label} className="border border-terminal-border rounded p-3 bg-[#0d0d0d]">
+                <span className="text-accent font-semibold text-xs">
+                  {interest.label}/
+                </span>
+                <p className="text-muted text-xs mt-1">
+                  {interest.text}
+                </p>
+              </div>
+            ))}
+          </div>
+        )}
+
+        {step >= 5 && (
+          <div className="mt-4">
+            <span className="text-accent">$</span>{" "}
+            <TypingEffect
+              text="tail -f ai-journal.log"
+              speed={60}
+              delay={300}
+              onDone={() => setStep(6)}
+            />
+          </div>
+        )}
+
+        {step >= 6 && (
           <div className="ml-4 mt-2">
             <p className="text-muted text-sm mb-3">
               I write about one AI/ML topic every day →{" "}
@@ -198,7 +225,7 @@ function TerminalInner({
           </div>
         )}
 
-        {step >= 5 && (
+        {step >= 6 && (
           <div className="mt-2">
             <span className="text-accent">$</span>{" "}
             <span className="cursor-blink" />
@@ -218,7 +245,7 @@ export default function HomeTerminal() {
         <TerminalInner step={step} setStep={setStep} />
       </TerminalWindow>
 
-      {step >= 5 && (
+      {step >= 6 && (
         <>
           <CommandInput />
 
@@ -265,7 +292,7 @@ export function HomeTerminalContent() {
   return (
     <div className="p-5 font-mono text-sm leading-relaxed">
       <TerminalInner step={step} setStep={setStep} />
-      {step >= 5 && (
+      {step >= 6 && (
         <div className="mt-6">
           <CommandInput />
         </div>

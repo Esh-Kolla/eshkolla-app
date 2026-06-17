@@ -41,6 +41,13 @@ export default function Home() {
             <p>{cat.items.join(", ")}</p>
           </div>
         ))}
+        <h2>Interests</h2>
+        {BIO.interests.map((interest) => (
+          <div key={interest.label}>
+            <h3>{interest.label}</h3>
+            <p>{interest.text}</p>
+          </div>
+        ))}
       </section>
       <HomeTerminal />
     </>

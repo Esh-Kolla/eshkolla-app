@@ -122,6 +122,26 @@ export default function ResumeWindow() {
         </div>
       </div>
 
+      {/* Interests */}
+      <div className="mb-6">
+        <h3 className="text-foreground font-semibold mb-3">
+          <span className="text-accent">$</span> cat interests.txt
+        </h3>
+        <div className="ml-4 space-y-3">
+          {BIO.interests.map((interest) => (
+            <div
+              key={interest.label}
+              className="border border-terminal-border rounded p-3 bg-[#0d0d0d]"
+            >
+              <span className="text-accent font-semibold text-xs">
+                {interest.label}/
+              </span>
+              <p className="text-muted text-xs mt-1">{interest.text}</p>
+            </div>
+          ))}
+        </div>
+      </div>
+
       {/* Contact */}
       <div className="mb-2">
         <h3 className="text-foreground font-semibold mb-3">
