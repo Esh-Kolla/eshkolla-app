@@ -220,10 +220,10 @@ export default function DockNew() {
         }
       `}</style>
 
-      <div className="fixed bottom-3 left-1/2 -translate-x-1/2 z-40 max-w-[calc(100vw-16px)]">
+      <div className="fixed bottom-2 md:bottom-3 left-1/2 -translate-x-1/2 z-40 max-w-[calc(100vw-16px)]">
         <div
           ref={dockRef}
-          className="flex items-end gap-1 px-2 py-1.5 bg-white/10 backdrop-blur-2xl rounded-2xl border border-white/20 shadow-2xl overflow-x-auto"
+          className="flex items-end gap-0.5 md:gap-1 px-1.5 md:px-2 py-1 md:py-1.5 bg-white/10 backdrop-blur-2xl rounded-2xl border border-white/20 shadow-2xl"
           onMouseMove={handleMouseMove}
           onMouseLeave={handleMouseLeave}
         >
@@ -232,7 +232,7 @@ export default function DockNew() {
               return (
                 <div
                   key="separator"
-                  className="w-px h-8 bg-white/20 mx-1 self-center"
+                  className="w-px h-6 md:h-8 bg-white/20 mx-0.5 md:mx-1 self-center"
                 />
               );
             }
@@ -268,7 +268,7 @@ export default function DockNew() {
                 {/* Icon with magnification + bounce */}
                 <div
                   style={{
-                    transform: `scale(${isMobile ? 0.8 * scale : scale})`,
+                    transform: `scale(${isMobile ? 0.65 * scale : scale})`,
                     transformOrigin: "bottom",
                     transition: "transform 0.1s ease-out",
                     animation: isBouncing

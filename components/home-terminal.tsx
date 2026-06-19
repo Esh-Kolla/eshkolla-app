@@ -22,13 +22,16 @@ function TerminalInner({
 }) {
   return (
     <>
-      <div className="glitch mb-6" data-text={ASCII_NAME}>
-        <pre className="text-foreground text-glow text-xs leading-tight">
+      <div className="glitch mb-4 md:mb-6 hidden sm:block" data-text={ASCII_NAME}>
+        <pre className="text-foreground text-glow text-[9px] sm:text-xs leading-tight">
           {ASCII_NAME}
         </pre>
       </div>
+      <div className="sm:hidden mb-4">
+        <h1 className="text-foreground text-glow text-lg font-bold">ESHWAR</h1>
+      </div>
 
-      <div className="space-y-4">
+      <div className="space-y-3 md:space-y-4">
         <div>
           <span className="text-accent">$</span>{" "}
           <TypingEffect
@@ -39,7 +42,7 @@ function TerminalInner({
         </div>
 
         {step >= 1 && (
-          <div className="ml-4 text-[#cccccc]">
+          <div className="ml-2 md:ml-4 text-[#cccccc]">
             <p>
               <strong className="text-foreground">{BIO.name}</strong>{" "}
               <span className="text-sm">🇮🇳 🇺🇸</span> — {BIO.title} at{" "}
@@ -72,7 +75,7 @@ function TerminalInner({
         )}
 
         {step >= 2 && (
-          <div className="ml-4 text-[#cccccc] space-y-2">
+          <div className="ml-2 md:ml-4 text-[#cccccc] space-y-2 text-xs md:text-sm">
             <p>
               Deloitte Consulting in Bangalore → Swastiks Food ($300M
               revenue, built predictive models with 92% forecast accuracy) →
@@ -121,9 +124,9 @@ function TerminalInner({
         )}
 
         {step >= 3 && (
-          <div className="ml-4 mt-1 space-y-3">
+          <div className="ml-2 md:ml-4 mt-1 space-y-2 md:space-y-3">
             {BIO.projects.map((project) => (
-              <div key={project.name} className="border border-terminal-border rounded p-3 bg-[#0d0d0d]">
+              <div key={project.name} className="border border-terminal-border rounded p-2 md:p-3 bg-[#0d0d0d]">
                 <a
                   href={project.url}
                   target="_blank"
@@ -153,15 +156,15 @@ function TerminalInner({
         )}
 
         {step >= 4 && (
-          <div className="ml-4 mt-1 space-y-3">
+          <div className="ml-2 md:ml-4 mt-1 space-y-2 md:space-y-3">
             {BIO.skills.map((cat) => (
               <div key={cat.label}>
                 <span className="text-dim text-xs">{cat.label}/</span>
-                <div className="flex flex-wrap gap-1.5 mt-1">
+                <div className="flex flex-wrap gap-1 md:gap-1.5 mt-1">
                   {cat.items.map((skill) => (
                     <span
                       key={skill}
-                      className="text-xs px-2 py-0.5 rounded border border-terminal-border text-foreground hover:text-glow transition-all"
+                      className="text-[10px] md:text-xs px-1.5 md:px-2 py-0.5 rounded border border-terminal-border text-foreground hover:text-glow transition-all"
                     >
                       {skill}
                     </span>
@@ -185,9 +188,9 @@ function TerminalInner({
         )}
 
         {step >= 5 && (
-          <div className="ml-4 mt-1 space-y-3">
+          <div className="ml-2 md:ml-4 mt-1 space-y-2 md:space-y-3">
             {BIO.interests.map((interest) => (
-              <div key={interest.label} className="border border-terminal-border rounded p-3 bg-[#0d0d0d]">
+              <div key={interest.label} className="border border-terminal-border rounded p-2 md:p-3 bg-[#0d0d0d]">
                 <span className="text-accent font-semibold text-xs">
                   {interest.label}/
                 </span>
@@ -212,8 +215,8 @@ function TerminalInner({
         )}
 
         {step >= 6 && (
-          <div className="ml-4 mt-2">
-            <p className="text-muted text-sm mb-3">
+          <div className="ml-2 md:ml-4 mt-2">
+            <p className="text-muted text-xs md:text-sm mb-3">
               I write about one AI/ML topic every day →{" "}
               <a
                 href="/blog"
@@ -290,7 +293,7 @@ export function HomeTerminalContent() {
   const [step, setStep] = useState(0);
 
   return (
-    <div className="p-5 font-mono text-sm leading-relaxed">
+    <div className="p-3 md:p-5 font-mono text-xs md:text-sm leading-relaxed">
       <TerminalInner step={step} setStep={setStep} />
       {step >= 6 && (
         <div className="mt-6">

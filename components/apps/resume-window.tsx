@@ -4,7 +4,7 @@ import { BIO } from "@/lib/data/bio";
 
 export default function ResumeWindow() {
   return (
-    <div className="p-5 font-mono text-sm leading-relaxed overflow-y-auto">
+    <div className="p-3 md:p-5 font-mono text-xs md:text-sm leading-relaxed overflow-y-auto">
       {/* Download link */}
       <div className="flex justify-end mb-4">
         <a
@@ -37,11 +37,11 @@ export default function ResumeWindow() {
       </div>
 
       {/* Education */}
-      <div className="mb-6">
+      <div className="mb-4 md:mb-6">
         <h3 className="text-foreground font-semibold mb-3">
           <span className="text-accent">$</span> cat education.txt
         </h3>
-        <div className="ml-4 space-y-2">
+        <div className="ml-2 md:ml-4 space-y-2">
           {BIO.education.map((edu) => (
             <div key={edu.school}>
               <span className="text-foreground">{edu.school}</span>
@@ -59,11 +59,11 @@ export default function ResumeWindow() {
       </div>
 
       {/* Journey / Experience */}
-      <div className="mb-6">
+      <div className="mb-4 md:mb-6">
         <h3 className="text-foreground font-semibold mb-3">
           <span className="text-accent">$</span> cat journey.txt
         </h3>
-        <ul className="ml-4 space-y-2">
+        <ul className="ml-2 md:ml-4 space-y-2">
           {BIO.journey.map((item, i) => (
             <li key={i} className="text-muted">
               <span className="text-dim mr-2">&bull;</span>
@@ -74,19 +74,19 @@ export default function ResumeWindow() {
       </div>
 
       {/* Skills */}
-      <div className="mb-6">
+      <div className="mb-4 md:mb-6">
         <h3 className="text-foreground font-semibold mb-3">
           <span className="text-accent">$</span> ls skills/
         </h3>
-        <div className="ml-4 space-y-3">
+        <div className="ml-2 md:ml-4 space-y-2 md:space-y-3">
           {BIO.skills.map((cat) => (
             <div key={cat.label}>
               <span className="text-dim text-xs">{cat.label}/</span>
-              <div className="flex flex-wrap gap-1.5 mt-1">
+              <div className="flex flex-wrap gap-1 md:gap-1.5 mt-1">
                 {cat.items.map((skill) => (
                   <span
                     key={skill}
-                    className="text-xs px-2 py-0.5 rounded border border-terminal-border text-foreground"
+                    className="text-[10px] md:text-xs px-1.5 md:px-2 py-0.5 rounded border border-terminal-border text-foreground"
                   >
                     {skill}
                   </span>
@@ -98,15 +98,15 @@ export default function ResumeWindow() {
       </div>
 
       {/* Projects */}
-      <div className="mb-6">
+      <div className="mb-4 md:mb-6">
         <h3 className="text-foreground font-semibold mb-3">
           <span className="text-accent">$</span> ls building/
         </h3>
-        <div className="ml-4 space-y-3">
+        <div className="ml-2 md:ml-4 space-y-2 md:space-y-3">
           {BIO.projects.map((project) => (
             <div
               key={project.name}
-              className="border border-terminal-border rounded p-3 bg-[#0d0d0d]"
+              className="border border-terminal-border rounded p-2 md:p-3 bg-[#0d0d0d]"
             >
               <a
                 href={project.url}
@@ -123,15 +123,15 @@ export default function ResumeWindow() {
       </div>
 
       {/* Interests */}
-      <div className="mb-6">
+      <div className="mb-4 md:mb-6">
         <h3 className="text-foreground font-semibold mb-3">
           <span className="text-accent">$</span> cat interests.txt
         </h3>
-        <div className="ml-4 space-y-3">
+        <div className="ml-2 md:ml-4 space-y-2 md:space-y-3">
           {BIO.interests.map((interest) => (
             <div
               key={interest.label}
-              className="border border-terminal-border rounded p-3 bg-[#0d0d0d]"
+              className="border border-terminal-border rounded p-2 md:p-3 bg-[#0d0d0d]"
             >
               <span className="text-accent font-semibold text-xs">
                 {interest.label}/
@@ -147,7 +147,7 @@ export default function ResumeWindow() {
         <h3 className="text-foreground font-semibold mb-3">
           <span className="text-accent">$</span> cat contact.txt
         </h3>
-        <div className="ml-4 space-y-1">
+        <div className="ml-2 md:ml-4 space-y-1">
           <p>
             <span className="text-dim">email</span>
             <span className="text-dim mx-2">&rarr;</span>

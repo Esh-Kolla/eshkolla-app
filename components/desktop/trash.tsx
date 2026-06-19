@@ -123,7 +123,7 @@ export default function Trash() {
   return (
     <div
       ref={localRef}
-      className="absolute bottom-20 right-6 flex flex-col items-center cursor-default select-none"
+      className="absolute bottom-20 right-6 hidden md:flex flex-col items-center cursor-default select-none"
       aria-label="Trash"
     >
       {/* Icon container — matches desktop icon sizing */}

@@ -75,7 +75,9 @@ function WindowInner({
   const posY = shouldFill ? 0 : win.position.y;
   const width = shouldFill ? "100%" : win.size.width;
   const height = shouldFill
-    ? "calc(100vh - 28px - 70px)"
+    ? isMobile
+      ? "calc(100dvh - 28px - 56px)"
+      : "calc(100vh - 28px - 70px)"
     : win.size.height;
 
   // ---------------------------------------------------------------------------
