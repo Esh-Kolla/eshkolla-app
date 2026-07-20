@@ -2,6 +2,7 @@
 
 import { useCallback, useState } from "react";
 import { useWindowManager } from "./window-manager";
+import { BIO } from "@/lib/data/bio";
 
 // ---------------------------------------------------------------------------
 // Icon definitions
@@ -60,7 +61,7 @@ const ICONS: DesktopIcon[] = [
     id: "github",
     label: "GitHub",
     type: "external",
-    url: "https://github.com/eshwarkolla",
+    url: BIO.social.github,
     gradient:
       "bg-gradient-to-b from-[#333] to-[#1a1a1a] border border-white/10",
     icon: (

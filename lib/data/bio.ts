@@ -11,7 +11,7 @@ export const BIO = {
   email: "eshwar.kolla@outlook.com",
 
   social: {
-    github: "https://github.com/eshwarkolla",
+    github: "https://github.com/esh-kolla",
     linkedin: "https://linkedin.com/in/eshwarkolla",
     x: "https://x.com/eshwarkolla",
   },

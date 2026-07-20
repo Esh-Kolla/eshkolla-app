@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useRef, useEffect } from "react";
+import { BIO } from "@/lib/data/bio";
 
 const NEOFETCH = `
   ┌───────────────────────────────────┐
@@ -124,7 +125,7 @@ Pursuing MS in Data Science & ML at Harrisburg.`,
 
   neofetch: NEOFETCH,
 
-  contact: `  github    → github.com/eshwarkolla
+  contact: `  github    → ${BIO.social.github.replace("https://", "")}
   linkedin  → linkedin.com/in/eshwarkolla
   x/twitter → x.com/eshwarkolla
   email     → eshwar.kolla@outlook.com`,

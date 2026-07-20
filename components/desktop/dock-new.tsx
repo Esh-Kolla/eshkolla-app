@@ -2,6 +2,7 @@
 
 import { useCallback, useEffect, useRef, useState, type MouseEvent } from "react";
 import { useWindowManagerSafe, type WindowState } from "./window-manager";
+import { BIO } from "@/lib/data/bio";
 
 // ---------------------------------------------------------------------------
 // Types
@@ -99,7 +100,7 @@ const APP_ITEMS: DockItemConfig[] = [
 const SEPARATOR = "separator" as const;
 
 const EXTERNAL_ITEMS: DockItemConfig[] = [
-  { id: "github", label: "GitHub", icon: GitHubIcon, type: "external", href: "https://github.com/eshwarkolla" },
+  { id: "github", label: "GitHub", icon: GitHubIcon, type: "external", href: BIO.social.github },
   { id: "linkedin", label: "LinkedIn", icon: LinkedInIcon, type: "external", href: "https://linkedin.com/in/eshwarkolla" },
   { id: "x", label: "X", icon: XIcon, type: "external", href: "https://x.com/eshwarkolla" },
   { id: "email", label: "Email", icon: EmailIcon, type: "external", href: "mailto:eshwar.kolla@outlook.com" },

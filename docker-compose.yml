@@ -2,26 +2,11 @@ services:
   web:
     build: .
     restart: unless-stopped
+    # Cloudflare Tunnel (cloudflared, running on the host) proxies to this port.
+    # See deploy/README.md — there is no reverse proxy in front of it.
     ports:
       - "4917:3000"
     volumes:
       - ./data:/app/data
     env_file:
       - .env
-
-  caddy:
-    image: caddy:2-alpine
-    restart: unless-stopped
-    ports:
-      - "9280:80"
-      - "9243:443"
-    volumes:
-      - ./Caddyfile:/etc/caddy/Caddyfile
-      - caddy_data:/data
-      - caddy_config:/config
-    depends_on:
-      - web
-
-volumes:
-  caddy_data:
-  caddy_config:
