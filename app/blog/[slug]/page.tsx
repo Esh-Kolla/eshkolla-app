@@ -3,6 +3,7 @@ import { MDXRemote } from "next-mdx-remote/rsc";
 import { getPostBySlug, getAllSlugs } from "@/lib/posts";
 import BarChart from "@/components/charts/bar-chart";
 import Chart from "@/components/charts/chart";
+import InferenceChart from "@/components/charts/inference-chart";
 import ReadingProgress from "@/components/reading-progress";
 import TableOfContents from "@/components/table-of-contents";
 import RelatedPosts from "@/components/related-posts";
@@ -105,7 +106,7 @@ export default async function PostPage({
       <TableOfContents />
 
       <div className="prose-terminal">
-        <MDXRemote source={post.content} components={{ BarChart, Chart }} />
+        <MDXRemote source={post.content} components={{ BarChart, Chart, InferenceChart }} />
       </div>
 
       <RelatedPosts currentSlug={slug} currentTags={post.tags} />
