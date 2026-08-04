@@ -1,0 +1,48 @@
+---
+title: "Why We're Building Paralegal-as-a-Service at AlvvaOS"
+date: "2026-08-05"
+summary: "Immigration law runs on paralegal labor that costs $60-80K a year per seat. We think self-learning agents can do the end-to-end casework, priced per case instead of per salary."
+tags: ["alvva", "agents", "immigration", "startups"]
+---
+
+Every immigration law firm I've talked to in the last year has the same bottleneck, and it isn't legal expertise. It's the paralegal queue.
+
+A typical employment-based case touches a paralegal maybe 15-25 hours: intake forms, chasing clients for documents, extracting data from passports and I-94s, drafting the I-485 or I-130, assembling the exhibit packet, writing the cover letter, tracking USCIS receipt notices. Attorneys review and sign, but the assembly line underneath is manual labor. Good paralegals cost $60-80K fully loaded in most markets, they burn out on repetitive work, and firms can't scale headcount linearly with caseload. So cases wait.
+
+We're building the alternative at AlvvaOS: paralegal work as a service, priced per case, powered by self-learning agents that run the workflow end to end.
+
+## What "end to end" actually means
+
+Not a chatbot that answers questions. An agent pipeline that takes a case from client intake to attorney-ready filing packet:
+
+1. **Intake.** Client gets a WhatsApp message in their language. The agent walks them through questions, collects passport photos, prior visas, marriage certificates — whatever the case type needs.
+2. **Extraction.** Vision models pull structured data off the documents. Passport MRZ, I-94 travel history, prior petition numbers. This is where our fine-tuning on real USCIS filings pays off; generic OCR mangles these forms.
+3. **Drafting.** The agent fills the actual forms — I-485, I-130, N-400, I-765 — cross-checking answers against the extracted documents. Dates that don't add up get flagged, not guessed.
+4. **Assembly.** Cover letter, exhibit list, supporting evidence ordered the way USCIS officers expect to see it. This ordering is tribal knowledge; we encoded it from attorneys who've filed thousands of cases.
+5. **Attorney review.** Everything lands in the firm's portal with a sign-off queue. Nothing files without a licensed attorney approving it. That gate is non-negotiable — it's both an ethics requirement and the trust anchor for the whole product.
+
+The firm's cost structure changes completely. Instead of a salary whether or not cases come in, they pay per case completed. Slow month, low cost. Busy season, instant capacity.
+
+## The self-learning part
+
+"Self-learning" is an abused phrase, so let me be precise about what our agents actually do.
+
+Every attorney correction becomes training signal. When an attorney edits a drafted cover letter or fixes a form field, that diff gets captured, categorized, and fed back. The next case of the same type for that firm reflects the correction. Firms effectively get an agent that learns their house style — how this partner likes waiver arguments phrased, which evidence that office considers essential for an RFE response.
+
+The second loop is outcome data. USCIS issues RFEs and NOIDs for patterns, and those patterns shift. When a case gets an RFE, the agent analyzes what triggered it and adjusts checklists for similar future cases. A filing strategy that worked in 2024 quietly stops being suggested if 2026 adjudications turned against it.
+
+Neither loop removes the attorney. They make the attorney's hour of review worth more, because the packet they're reviewing keeps getting closer to right.
+
+## Why per-case pricing matters
+
+SaaS per-seat pricing makes no sense here. The value isn't access to software; it's completed casework. Per-case pricing aligns us with the firm's revenue instead of their headcount budget.
+
+It also forces honesty on our side. If the agents produce a packet the attorney has to substantially redo, we didn't deliver a case — we delivered a chore. Pricing per case means we only win when the output is genuinely sign-off-ready. That's a much harder bar than "users logged in this month," and it's the right bar.
+
+There's a labor question I think about a lot: are we replacing paralegals? My honest answer is that we're replacing the version of the job that made talented people quit — the data entry, the document chasing, the tenth identical G-28 of the week. The firms we work with are redirecting their paralegals toward client relationships and complex case strategy, the work that actually needs a human. The queue was never the job. It was just the part that ate the job.
+
+## Where we are
+
+The pipeline runs today on the affirmative case types — family and employment-based adjustment, naturalization, work authorization. Every case still goes through attorney sign-off, and the early numbers on first-pass acceptance are encouraging enough that we're opening this up beyond our pilot firms.
+
+If you run an immigration practice and your paralegal queue is the reason clients wait weeks, I'd genuinely like to hear from you. This is one of those rare problems where the technology, the economics, and the actual human need all point the same direction.
