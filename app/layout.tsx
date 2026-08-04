@@ -4,6 +4,7 @@ import BootSequence from "@/components/boot-sequence";
 import Desktop from "@/components/desktop";
 import PageTracker from "@/components/page-tracker";
 import { SITE_URL, BIO } from "@/lib/data/bio";
+import { getAllPosts } from "@/lib/posts";
 import "./globals.css";
 
 const jetbrainsMono = JetBrains_Mono({
@@ -45,6 +46,8 @@ export default function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const posts = getAllPosts();
+
   return (
     <html lang="en" className={`${jetbrainsMono.variable} h-full`}>
       <head>
@@ -58,7 +61,7 @@ export default function RootLayout({
       <body className="min-h-full flex flex-col font-mono bg-background text-foreground">
         <BootSequence>
           <PageTracker />
-          <Desktop>
+          <Desktop posts={posts}>
             {children}
           </Desktop>
         </BootSequence>
