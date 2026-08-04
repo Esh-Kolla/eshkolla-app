@@ -1,0 +1,58 @@
+---
+title: "I Let an Agent Run My Blog for a Week. Here's What Broke."
+date: "2026-08-04"
+summary: "Automating content is easy. Automating content that doesn't read like a press release is the actual problem."
+tags: ["agents", "automation", "writing", "llm"]
+---
+
+Two weeks ago my blog had one post. It's a good post! But one post is a graveyard, not a blog. I build agent systems for a living, so I did the obvious thing: I wired an agent to write and publish for me daily.
+
+It worked on the first try. That's what worried me.
+
+## The setup
+
+Nothing fancy. A cron job fires every morning, an agent drafts a post as MDX, commits it, pushes to GitHub, and rebuilds the Docker container serving the site. Total moving parts: one YAML block and a prompt.
+
+The first post it shipped was technically perfect. Frontmatter valid, tags sensible, 800 words, clean headers. It was also completely unreadable. Every paragraph opened with a throat-clearing phrase, every section ended with a tidy little bow, and the whole thing had the personality of a Terms of Service update.
+
+## What "AI voice" actually looks like
+
+I ran the draft through my own detector: read it out loud. If you sound like a keynote you didn't want to attend, it fails.
+
+The tells were textbook. "In today's fast-paced world" energy. Bolded list headers with colons. Three parallel examples where one would do. A conclusion that gestured at a bright future without saying anything. The draft used the word "leverage" four times. I have never said leverage out loud in my life.
+
+Here's the thing people miss about AI-generated text: the problem isn't accuracy. The facts were fine. The problem is the draft had no stakes, no opinions, and no specific memories. Humans write from scars. Models write from averages.
+
+## Fixing it with prompt surgery
+
+I didn't add a "sound human" instruction. That does nothing. Instead I gave the agent constraints it couldn't weasel out of:
+
+- Banned word list: delve, leverage, landscape, testament, "it's not just X, it's Y", em dashes
+- Every post must contain at least one first-person anecdote with a concrete detail (a number, a date, a thing that broke)
+- Vary sentence length or fail review. Two sentences in a row with the same structure = rewrite
+- No conclusion section. End on the last real point.
+
+The anecdote requirement did the most work. Once the model has to commit to "on March 12th my deploy failed because X," it stops floating in generalities. Specificity is the enemy of slop.
+
+## Where the data chart earned its keep
+
+A wall of prose still feels generated. Real engineers paste terminal output, so I added a small component that renders charts in the site's terminal style. This morning's post about local inference used it:
+
+<BarChart title="llama.cpp throughput, M4 Pro, Q4_K_M" unit="tok/s" data={[
+  { label: "7B", value: 68 },
+  { label: "13B", value: 41 },
+  { label: "34B", value: 17 },
+  { label: "70B", value: 6 }
+]} />
+
+Those numbers are from my own machine, measured with `llama-bench`, not scraped from a marketing page. That's the bar now: if a chart goes in a post, the data has to come from something I actually ran.
+
+## What still breaks
+
+Topic selection is the weak link. Left alone, the agent gravitates toward "What Is RAG" explainers, the broccoli of AI content. I fixed this by making it read the last ten posts first and banning any category used in the previous three days.
+
+It also can't know what I worked on yesterday. The best posts come from real work, so I drop a one-line note in a `topics.md` file when something interesting happens, and the agent checks that file first. Low-tech. Extremely effective.
+
+The honest summary: the agent handles the plumbing and the first 70%. My job is the 30% that's actually the writing, knowing which detail matters and which claim I don't believe. I review every post before it deploys. Some mornings that's five minutes. Some mornings I rewrite half of it, which is still faster than staring at a blank page.
+
+One post to daily posts, and the graveyard has a pulse. Now I just have to keep the bar where I set it.
