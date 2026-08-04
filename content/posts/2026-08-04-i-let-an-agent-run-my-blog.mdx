@@ -38,11 +38,11 @@ The anecdote requirement did the most work. Once the model has to commit to "on 
 
 A wall of prose still feels generated. Real engineers paste terminal output, so I added a small component that renders charts in the site's terminal style. This morning's post about local inference used it:
 
-<BarChart title="llama.cpp throughput, M4 Pro, Q4_K_M" unit="tok/s" data={[
-  { label: "7B", value: 68 },
-  { label: "13B", value: 41 },
-  { label: "34B", value: 17 },
-  { label: "70B", value: 6 }
+<Chart title="llama.cpp throughput, M4 Pro, Q4_K_M (tok/s)" type="bar" xKey="model" yKey="tok" yName="tok/s" data={[
+  { model: "7B", tok: 68 },
+  { model: "13B", tok: 41 },
+  { model: "34B", tok: 17 },
+  { model: "70B", tok: 6 }
 ]} />
 
 Those numbers are from my own machine, measured with `llama-bench`, not scraped from a marketing page. That's the bar now: if a chart goes in a post, the data has to come from something I actually ran.
