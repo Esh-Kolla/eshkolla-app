@@ -1,0 +1,50 @@
+---
+title: "Structured Output Is Not Structured"
+date: "2026-08-07"
+summary: "Function calling gives you clean JSON 92% of the time. The engineering work is the other 8%. What I learned building a passport extraction pipeline for Alvva."
+tags: ["agents", "structured-output", "engineering", "llm"]
+---
+
+I trusted function calling. That was my first mistake.
+
+When you read the API docs for structured output, the pitch is clean: define a schema, pass it to the model, get back valid JSON. No more parsing errors, no more regex extraction, no more hoping the model wraps its answer in the right tags. I was building the passport extraction step for Alvva's intake pipeline, and function calling looked like the answer.
+
+I defined a schema. Passport number, surname, given names, nationality, date of birth, expiry date, MRZ line. Seven fields. I passed it to the model, ran it on a batch of 500 passport images from our test set, and checked the results.
+
+92% were perfect. Name matched, dates matched, passport number matched. I was ready to ship.
+
+Then I looked at the 8%.
+
+## What the 8% looked like
+
+The failures were not what I expected. I expected empty fields or null where a number should be. What I got was worse: plausible-looking garbage.
+
+A passport number that was one character too long. A date of birth in DD/MM/YYYY format when the form needed YYYY-MM-DD. A surname field that contained the full name because the model decided the MRZ did not clearly separate surname from given names. One passport had the nationality as "USA" when the passport said "United States of America." Another had the expiry date transposed with the issue date.
+
+Every one of these would pass a naive schema validation. They are strings. They are the right type. They fit the field. They are wrong.
+
+The model was not hallucinating randomly. It was making reasonable guesses when the image was ambiguous. A slightly blurred MRZ line, a passport photo that covered part of the text, a non-Latin character set. When the model was unsure, it filled in the most likely value instead of saying it was unsure. Function calling does not have a confidence field.
+
+## The validation loop
+
+I spent three days building what I now call the validation loop. It is not clever. It is the boring, obvious thing that works.
+
+Step one: the model extracts the fields and the raw MRZ string. Step two: a separate validation pass checks the extracted fields against the MRZ. The MRZ has a checksum character. If the computed checksum does not match, the extraction is wrong. Step three: if validation fails, the model gets the error and tries again, up to three times. Step four: if it still fails, the field gets flagged for human review.
+
+<BarChart title="Passport extraction accuracy, 500-image test set" unit="% correct" data={[{ label: "Raw function calling", value: 92 }, { label: "+ MRZ checksum", value: 96 }, { label: "+ retry loop (3x)", value: 99.2 }]} />
+
+The checksum was the key insight. The MRZ is not just a string of text. It is a string with built-in error detection. Two check digits per line, computed from the preceding characters. If your extraction does not pass the checksum, you know it is wrong without comparing to anything else. This is a property of the document format that I was ignoring because the API promised me structured output.
+
+After adding the checksum validation, accuracy went from 92% to 96%. The remaining 4% were cases where the image was genuinely too degraded for reliable extraction. Adding the retry loop, where the model re-examines the image with the error message as context, got me to 99.2%. The last 0.8% goes to human review.
+
+## What I stopped believing
+
+I stopped believing that function calling solves the structured output problem. It solves the JSON formatting problem. Those are different problems.
+
+The JSON formatting problem is: can the model produce syntactically valid JSON that matches my schema? Function calling solves this. It is reliable and I have not seen a malformed JSON response since I switched to it.
+
+The structured output problem is: can the model produce values that are correct for my domain? No API feature solves this. This is the work. You validate against the real constraints of your data. If the document has a checksum, you check it. If the date has a valid range, you enforce it. If the field has a relationship to another field, you verify it. The model produces candidates. Your code decides whether to trust them.
+
+The cost of the loop is real. The validation pass adds one more model call per extraction, and the retry loop means some passports take four calls instead of one. On our test set, average latency went from 0.8 seconds to 2.3 seconds per passport. For a pipeline that processes documents at intake, that is fine. For a chat interface, it would be unacceptable.
+
+I think about this every time someone asks whether structured output is "solved" now. The formatting is solved. The trust is not. Trust comes from validation, and validation is domain-specific work that no model API can do for you. The 92% that worked on the first try was never the interesting part. The interesting part is what you do with the 8% that looked right and was not.
