@@ -73,10 +73,10 @@ export async function POST(request: Request) {
       model: CHAT_MODEL,
       messages,
       stream: true,
-      // Disable reasoning so the model responds immediately instead of
-      // spending 10-30s on internal reasoning tokens that never reach the
-      // client (Cloudflare Tunnel times out on the silent gap).
-      reasoning: false,
+      // Minimal reasoning effort so the model responds immediately.
+      // Default reasoning emits 40+ reasoning tokens before any content,
+      // causing Cloudflare Tunnel to time out on the silent gap.
+      reasoning_effort: "minimal",
     }),
   });
 
