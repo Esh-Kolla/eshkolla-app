@@ -1,0 +1,68 @@
+---
+title: "ML From Scratch #1: Gradient Descent, the Algorithm Under Everything"
+date: "2026-08-08"
+summary: "Every model you've ever used was trained by some flavor of gradient descent. Here's the whole idea, derived by hand and visualized live. First in a series that rebuilds ML from first principles."
+tags: ["ml-from-scratch", "gradient-descent", "optimization", "math"]
+series: "ml-from-scratch"
+---
+
+This is the first post in a series where I rebuild machine learning from first principles, one algorithm at a time, with the math derived by hand and a live visualization you can watch converge. No library magic, no "just call `model.fit()`". If you've used sklearn for years but couldn't derive what `.fit()` actually does, this series is for you.
+
+We start with gradient descent because everything else — logistic regression, backprop, the Adam optimizer training your favorite LLM — is this one idea with extra steps.
+
+## The problem: fitting a line
+
+Say you're a small business owner. You have last year's numbers: how much you spent on ads each month, and what sales looked like. You suspect more spending means more sales, and you want a formula: `sales = w * spending + b`.
+
+There are infinitely many lines you could draw through the data. Which one is "best"? You need a way to score a line. The natural choice: for each data point, measure the vertical distance from the point to your line, square it (so over and under both count, and big misses count extra), and average across all points. That's mean squared error:
+
+```
+MSE = (1/n) * Σ (y_i - (w*x_i + b))²
+```
+
+Best line = the (w, b) pair with the lowest MSE. Now the question is mechanical: how do you find it?
+
+## The idea: roll downhill
+
+Picture the MSE as a landscape. Every possible (w, b) is a point on a map, and the MSE at that point is the elevation. The best line is the bottom of the valley.
+
+You're standing somewhere random on that landscape, blindfolded. How do you get to the bottom? You feel the ground around your feet, figure out which direction slopes down, and take a step. Repeat until the ground is flat.
+
+That's the entire algorithm. The "feeling the slope" part is the gradient — the partial derivatives of MSE with respect to w and b. Deriving them takes one chain rule each. For w:
+
+```
+∂MSE/∂w = -(2/n) * Σ x_i * (y_i - (w*x_i + b))
+```
+
+And for b, the same thing without the x_i term. Each update step:
+
+```
+w = w - lr * ∂MSE/∂w
+b = b - lr * ∂MSE/∂b
+```
+
+The `lr` (learning rate) is your step size. Too small and you're shuffling for hours. Too big and you leap over the valley and oscillate forever. Picking it is the first of a thousand hyperparameter judgments this series will make you comfortable with.
+
+## Watch it learn
+
+I coded the whole thing in about 40 lines. Here's the algorithm running live on a synthetic spending-vs-sales dataset — the line starts flat and walks itself to the best fit:
+
+<GradientDescentChart />
+
+Watch the cyan whiskers — those are the per-point errors, the thing MSE is measuring. As the line rotates and lifts into place, the whiskers shrink. The MSE counter in the corner is the actual loss value dropping each epoch. That's all training ever is.
+
+<Callout label="the whole trick">Gradient descent is 40 lines of code and one derivative. Every neural network ever trained is this loop with more parameters.</Callout>
+
+## Why this scales to everything
+
+With two parameters you could solve for the optimum in closed form (set the derivatives to zero, do algebra — that's the normal equation, and it's how Excel does linear regression). So why iterate?
+
+Because the closed form dies at scale. It requires inverting a matrix of all your features — O(n³) in the number of features. A modern model has billions of parameters. There is no closed form, and even if there were, no computer could evaluate it. Gradient descent's per-step cost is just one pass over the data, and with stochastic or mini-batch variants you don't even need the whole dataset at once.
+
+The same loop you're looking at — compute gradient, step downhill, repeat — trains GPT-scale models. The gradient just comes from backpropagation instead of our two hand-derived partials, and the step rule has momentum and adaptive rates bolted on. We'll build both of those later in the series.
+
+## Try it yourself
+
+The honest way to internalize this: implement it tonight. Synthetic data, two parameters, plain Python. Watch the loss print. Then break it — set the learning rate to 5 and watch the loss explode upward. Set it to 0.0001 and watch it crawl. That intuition for the loss landscape is worth more than ten chapters of theory.
+
+Next in the series: the perceptron — what happens when the output isn't a number but a yes/no, and why that small change broke machine learning for a decade.

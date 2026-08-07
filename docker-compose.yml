@@ -10,3 +10,6 @@ services:
       - ./data:/app/data
     env_file:
       - .env
+    extra_hosts:
+      # Lets the container reach the Hermes proxy (chat backend) on the host.
+      - "host.docker.internal:host-gateway"
