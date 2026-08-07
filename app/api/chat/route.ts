@@ -69,7 +69,15 @@ export async function POST(request: Request) {
       "Content-Type": "application/json",
       Authorization: "Bearer local",
     },
-    body: JSON.stringify({ model: CHAT_MODEL, messages, stream: true }),
+    body: JSON.stringify({
+      model: CHAT_MODEL,
+      messages,
+      stream: true,
+      // Disable reasoning so the model responds immediately instead of
+      // spending 10-30s on internal reasoning tokens that never reach the
+      // client (Cloudflare Tunnel times out on the silent gap).
+      reasoning: false,
+    }),
   });
 
   if (!upstream.ok || !upstream.body) {
@@ -111,6 +119,9 @@ export async function POST(request: Request) {
   });
 
   return new Response(stream, {
-    headers: { "Content-Type": "text/plain; charset=utf-8" },
+    headers: {
+      "Content-Type": "text/plain; charset=utf-8",
+      "X-Accel-Buffering": "no",
+    },
   });
 }
