@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import Link from "next/link";
 import { useWindowManagerSafe } from "./desktop/window-manager";
 
 export default function MenuBar() {
@@ -34,7 +35,13 @@ export default function MenuBar() {
     <div className="fixed top-0 left-0 right-0 z-50 h-7 flex items-center justify-between px-4 bg-black/60 backdrop-blur-xl border-b border-white/10 text-[#e0e0e0] text-xs select-none">
       <div className="flex items-center gap-4">
         <span className="text-sm font-semibold"></span>
-        <span className="font-semibold">{activeApp}</span>
+        <Link
+          href="/"
+          aria-label="Home"
+          className="font-semibold hover:text-white transition-colors py-1 -my-1"
+        >
+          {activeApp}
+        </Link>
         <span className="hidden md:inline text-[#e0e0e0]/70 hover:text-[#e0e0e0] cursor-default">
           File
         </span>

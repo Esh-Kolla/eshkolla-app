@@ -81,7 +81,7 @@ export default async function PostPage({
       <JsonLd data={postLd} />
       <Link
         href="/blog"
-        className="text-sm text-muted hover:text-accent transition-colors mb-6 inline-block"
+        className="text-sm text-muted hover:text-accent transition-colors mb-6 inline-block py-2 -my-2"
       >
         <span className="text-accent">$</span> cd ../
       </Link>

@@ -1,6 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useRef, useState, type MouseEvent } from "react";
+import { usePathname, useRouter } from "next/navigation";
 import { useWindowManagerSafe, type WindowState } from "./window-manager";
 import { BIO } from "@/lib/data/bio";
 
@@ -112,12 +113,14 @@ const ALL_ITEMS: (DockItemConfig | "separator")[] = [
   ...EXTERNAL_ITEMS,
 ];
 
-// Fallback URLs when window manager is not available
-const FALLBACK_URLS: Record<string, string> = {
+// Route targets for dock app items when NOT on the home page (no window
+// manager desktop canvas exists on routed pages, so openWindow would be a
+// no-op there — navigate instead).
+const ROUTE_TARGETS: Record<string, string> = {
   terminal: "/",
   blog: "/blog",
-  chat: "/",
-  resume: "/",
+  chat: "/?open=chat",
+  resume: "/?open=resume",
 };
 
 // ---------------------------------------------------------------------------
@@ -147,6 +150,9 @@ export default function DockNew() {
 
   // Safe window manager access — returns null when no provider is present
   const wm = useWindowManagerSafe();
+  const pathname = usePathname();
+  const router = useRouter();
+  const isHome = pathname === "/";
 
   const isWindowOpen = useCallback(
     (windowId: string): boolean => {
@@ -180,16 +186,16 @@ export default function DockNew() {
           window.open(item.href, "_blank");
         }
       } else if (item.windowId) {
-        if (wm) {
+        if (wm && isHome) {
+          // Home desktop: open the window in place
           wm.openWindow(item.windowId);
         } else {
-          // Fallback: navigate via URL when outside WindowManagerProvider
-          const url = FALLBACK_URLS[item.windowId] ?? "/";
-          window.location.href = url;
+          // Any routed page: navigate to a real destination
+          router.push(ROUTE_TARGETS[item.windowId] ?? "/");
         }
       }
     },
-    [wm],
+    [wm, isHome, router],
   );
 
   // Calculate parabolic magnification scale for a given icon index

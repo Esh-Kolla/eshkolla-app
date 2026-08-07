@@ -1,5 +1,7 @@
 "use client";
 
+import { useEffect } from "react";
+import { useSearchParams, useRouter } from "next/navigation";
 import { useWindowManager } from "./window-manager";
 import DesktopIcons from "./desktop-icons";
 import Window from "./window";
@@ -36,7 +38,20 @@ function WindowContent({ windowId, posts }: { windowId: string; posts?: DesktopC
 }
 
 export default function DesktopCanvas({ posts }: DesktopCanvasProps) {
-  const { windows } = useWindowManager();
+  const { windows, openWindow } = useWindowManager();
+  const searchParams = useSearchParams();
+  const router = useRouter();
+
+  // Deep links like /?open=chat (used by the dock on routed pages) open the
+  // matching window on load, then strip the param.
+  useEffect(() => {
+    const target = searchParams.get("open");
+    if (target === "chat" || target === "resume" || target === "terminal" || target === "blog") {
+      openWindow(target);
+      router.replace("/", { scroll: false });
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   return (
     <div
