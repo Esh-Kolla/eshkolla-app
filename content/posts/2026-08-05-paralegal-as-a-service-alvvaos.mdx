@@ -7,13 +7,19 @@ tags: ["alvva", "agents", "immigration", "startups"]
 
 Every immigration law firm I've talked to in the last year has the same bottleneck, and it isn't legal expertise. It's the paralegal queue.
 
-A typical employment-based case touches a paralegal maybe 15-25 hours: intake forms, chasing clients for documents, extracting data from passports and I-94s, drafting the I-485 or I-130, assembling the exhibit packet, writing the cover letter, tracking USCIS receipt notices. Attorneys review and sign, but the assembly line underneath is manual labor. Good paralegals cost $60-80K fully loaded in most markets, they burn out on repetitive work, and firms can't scale headcount linearly with caseload. So cases wait.
+A typical employment-based case touches a paralegal maybe 15-25 hours: intake forms, chasing clients for documents, extracting data from passports and I-94s, drafting the I-485 or I-130, assembling the exhibit packet, writing the cover letter, tracking USCIS receipt notices.
+
+<Callout label="the bottleneck">15-25 paralegal hours per case. $60-80K fully loaded per seat. Firms can't scale headcount linearly with caseload, so cases wait.</Callout>
+
+Attorneys review and sign, but the assembly line underneath is manual labor. Good paralegals cost $60-80K fully loaded in most markets, they burn out on repetitive work, and firms can't scale headcount linearly with caseload. So cases wait.
 
 We're building the alternative at AlvvaOS: paralegal work as a service, priced per case, powered by self-learning agents that run the workflow end to end.
 
 ## What "end to end" actually means
 
 Not a chatbot that answers questions. An agent pipeline that takes a case from client intake to attorney-ready filing packet:
+
+<PipelineDiagram />
 
 1. **Intake.** Client gets a WhatsApp message in their language. The agent walks them through questions, collects passport photos, prior visas, marriage certificates — whatever the case type needs.
 2. **Extraction.** Vision models pull structured data off the documents. Passport MRZ, I-94 travel history, prior petition numbers. This is where our fine-tuning on real USCIS filings pays off; generic OCR mangles these forms.
@@ -27,7 +33,18 @@ The firm's cost structure changes completely. Instead of a salary whether or not
 
 "Self-learning" is an abused phrase, so let me be precise about what our agents actually do.
 
-Every attorney correction becomes training signal. When an attorney edits a drafted cover letter or fixes a form field, that diff gets captured, categorized, and fed back. The next case of the same type for that firm reflects the correction. Firms effectively get an agent that learns their house style — how this partner likes waiver arguments phrased, which evidence that office considers essential for an RFE response.
+Every attorney correction becomes training signal. When an attorney edits a drafted cover letter or fixes a form field, that diff gets captured, categorized, and fed back.
+
+<Terminal title="learning loop">
+$ alvva feedback --case 8847
+  field: petitioner_middle_name
+  draft: "N/A"
+  attorney_edit: ""
+  rule: omit empty optional fields, never write N/A
+✓ rule applied to 14 open drafts
+</Terminal>
+
+The next case of the same type for that firm reflects the correction. Firms effectively get an agent that learns their house style — how this partner likes waiver arguments phrased, which evidence that office considers essential for an RFE response.
 
 The second loop is outcome data. USCIS issues RFEs and NOIDs for patterns, and those patterns shift. When a case gets an RFE, the agent analyzes what triggered it and adjusts checklists for similar future cases. A filing strategy that worked in 2024 quietly stops being suggested if 2026 adjudications turned against it.
 

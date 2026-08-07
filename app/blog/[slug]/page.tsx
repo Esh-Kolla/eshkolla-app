@@ -4,6 +4,10 @@ import { getPostBySlug, getAllSlugs } from "@/lib/posts";
 import BarChart from "@/components/charts/bar-chart";
 import Chart from "@/components/charts/chart";
 import InferenceChart from "@/components/charts/inference-chart";
+import FlowDiagram from "@/components/charts/flow-diagram";
+import Terminal from "@/components/charts/terminal";
+import Callout from "@/components/charts/callout";
+import PipelineDiagram from "@/components/charts/pipeline-diagram";
 import ReadingProgress from "@/components/reading-progress";
 import TableOfContents from "@/components/table-of-contents";
 import RelatedPosts from "@/components/related-posts";
@@ -106,7 +110,7 @@ export default async function PostPage({
       <TableOfContents />
 
       <div className="prose-terminal">
-        <MDXRemote source={post.content} components={{ BarChart, Chart, InferenceChart }} />
+        <MDXRemote source={post.content} components={{ BarChart, Chart, InferenceChart, FlowDiagram, Terminal, Callout, PipelineDiagram }} />
       </div>
 
       <RelatedPosts currentSlug={slug} currentTags={post.tags} />
