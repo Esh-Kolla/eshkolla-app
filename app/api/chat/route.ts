@@ -36,9 +36,13 @@ Social:
 - X: ${BIO.social.x}`;
 
 // Local Hermes proxy (OpenAI-compatible, backed by Nous OAuth) running on the
-// host machine. The container reaches it via host.docker.internal.
+// host machine. In Docker the container reaches it via host.docker.internal
+// (mapped in docker-compose.yml); in local dev it's plain localhost.
 const CHAT_BACKEND =
-  process.env.CHAT_BACKEND_URL ?? "http://host.docker.internal:8645/v1/chat/completions";
+  process.env.CHAT_BACKEND_URL ??
+  (process.env.NODE_ENV === "production"
+    ? "http://host.docker.internal:8645/v1/chat/completions"
+    : "http://127.0.0.1:8645/v1/chat/completions");
 const CHAT_MODEL = process.env.CHAT_MODEL ?? "z-ai/glm-5.2";
 
 export async function POST(request: Request) {
