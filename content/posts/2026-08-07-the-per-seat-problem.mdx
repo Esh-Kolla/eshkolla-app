@@ -1,0 +1,38 @@
+---
+title: "The Per-Seat Problem"
+date: "2026-08-07"
+summary: "Immigration law firms price by the hour and staff by the seat. AI agents break both assumptions. Here's why per-case pricing is the only model that makes sense for what we're building at Alvva."
+tags: ["alvva", "immigration", "startups", "founder-notes"]
+---
+
+I spent two hours on a call with an immigration attorney last Tuesday. She runs a four-person firm in San Jose. Does about 300 cases a year, mostly family-based adjustment of status. Smart, efficient, and drowning in paperwork.
+
+At one point she pulled up her queue. 47 active cases. Eighteen of them were waiting on her to review forms that paralegals had already filled out. She told me she spends the first 90 minutes of every day signing things, and the last hour checking what she signed.
+
+That's when it clicked for me. The problem isn't that attorneys need better tools. The problem is that the entire economics of an immigration firm assume a human reads every page.
+
+Here's the math. A paralegal in the Bay Area costs $60-80K per year. A midsize firm might have 3-5 of them. Each paralegal processes maybe 80-120 cases annually, depending on complexity. An I-485 adjustment of status packet is 40-60 pages when you include the I-944, affidavit of support, medical forms, and supporting evidence. At 300 cases a year, that firm is generating 12,000-18,000 pages of forms, all reviewed by a human who makes $35/hour.
+
+The attorney signs off on each case. At 5-10 minutes per review (optimistic for someone who's been doing it for years), that's 25-50 hours of attorney time per year just signing. At $300/hour billable, that's $7,500-15,000 of partner time spent checking boxes.
+
+<Callout label="Unit economics">A 300-case firm spends roughly $240K on paralegal salaries and $15K of attorney review time on form processing alone. That's $850 per case before anyone files anything.</Callout>
+
+Now here's where it gets interesting. The actual form-filling is deterministic. The I-485 asks the same 68 questions every time. The answers come from a fixed set of source documents: passport, birth certificate, I-94, prior approvals, marriage certificate, employer letter. A paralegal's job is to read those documents, extract the relevant fields, and transcribe them into the right boxes on the form.
+
+That is, quite literally, an extraction and mapping task. It's what language models are built for.
+
+But when I started talking to attorneys about this, the pushback was immediate and specific. "How do I know the AI didn't put the wrong A-number?" "What if it misses a discrepancy between the passport and the I-94?" "I'm the one who gets disbarred if the form is wrong."
+
+Fair points, all of them. The answer isn't "trust the AI." The answer is that the AI does the first pass, a human reviews the diff, and the attorney signs off. Same workflow, faster transcription, fewer copy errors. The paralegal goes from data entry to quality review. The attorney goes from signing 47 things to reviewing the 5 that had discrepancies flagged by the system.
+
+The pricing model has to follow the value. If I charge per seat, I'm just replacing a paralegal with software and keeping the same economics. The firm saves money but the incentive structure is wrong. They'd want fewer seats, which means fewer users, which means less engagement with the product.
+
+Per-case pricing aligns everything. The firm pays when a case moves through the pipeline. They can take more cases without hiring. The software gets better with every filed form because it learns from attorney corrections. The more cases run through Alvva, the cheaper each one gets, because the marginal cost of an AI-generated form approaches zero.
+
+I don't know if per-case is the final answer. Maybe it's per-form, or per-filing, or a hybrid where complex cases cost more. I've been wrong about pricing before. I thought Alvva should be a flat monthly SaaS subscription for the first three months of building, until I realized that a firm doing 50 cases a month and a firm doing 5 cases a month have nothing in common.
+
+What I'm confident about is that per-seat is wrong for this. The whole point is decoupling case volume from headcount. If your pricing model punishes the exact thing your product enables, you've built a contradiction into your business.
+
+The attorney on that call asked me one last question before we hung up. "If I can do 500 cases next year with the same team, what do I do with the extra margin?" I said that's the best question I've heard all week. She laughed and said she'd think about it.
+
+I'm still thinking about it too.
