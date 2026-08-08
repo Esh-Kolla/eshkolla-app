@@ -1,0 +1,66 @@
+---
+title: "Context Windows Are Not Memory"
+date: "2026-08-08"
+summary: "I stuffed 80K tokens of case history into a prompt and the model forgot the client's name. Here's what I learned about the difference between context and recall, and why retrieval still matters at 200K context."
+tags: ["llm", "retrieval", "engineering", "agents"]
+---
+
+I was debugging a weird failure last Thursday. The Alvva intake agent had a client's full case history in context — passport scan, I-94, prior petitions, three cover letters, a 12-page RFE response — about 80K tokens of material. I asked it a simple question: draft a status update referencing the client's current visa category.
+
+It wrote a polished status update. Referenced the wrong visa category. The client is on an E-2. The draft said H-1B. The E-2 petition was right there in the context, token 14,000-something. The model had the information. It did not use it.
+
+This is the thing nobody tells you about large context windows. Having the text in context is not the same as the model attending to it. The window is a buffer, not a memory.
+
+## The lost-in-the-middle problem
+
+There is a well-documented failure mode in long-context models called, bluntly, the "lost in the middle" effect. Models attend strongly to the beginning and end of the context. The middle is where information goes to die.
+
+I ran a test to see how bad it was for our use case. I placed a critical fact — the client's A-number, a 9-digit USCIS identifier — at different positions in a 60K-token context. Then I asked the model to recite it.
+
+```
+$ python bench_position.py --context 60000
+  position  1K:  100% correct (50/50)
+  position 15K:  94% correct (47/50)
+  position 30K:  64% correct (32/50)
+  position 45K:  88% correct (44/50)
+  position 58K: 100% correct (50/50)
+```
+
+The U-shape is real. At 30K tokens in, the model missed the A-number a third of the time. Same fact, same model, same prompt. Only the position changed.
+
+The implication for our pipeline was uncomfortable. A case file is not a short prompt. It is a pile of documents, some of which matter more than others, and the model does not know which is which until it reads them. If the passport MRZ lands in the middle of the context and the model forgets the A-number, the drafted form has a wrong identifier. That is not a cosmetic bug. USCIS rejects forms with mismatched A-numbers.
+
+## Why bigger windows do not fix this
+
+The reaction to lost-in-the-middle is always "use a model with a bigger context window." Gemini has 1M tokens now. Claude has 200K. The problem is that bigger windows do not come with proportionally better attention across the full span.
+
+The recall curves I have seen flatten or degrade as context grows. A model with 200K context does not recall position-100K information as reliably as it recalls position-5K information in a 10K context. You are trading depth for breadth. Sometimes that is the right trade. For case files, it usually is not.
+
+<Callout label="the real bottleneck">Context window size is a ceiling on how much text the model can see. Retrieval quality is the floor on how much it can actually use. The floor is what matters.</Callout>
+
+The floor is what matters. If I retrieve the right 8K tokens of relevant case material and put them at the top of the context, the model performs better than if I dump 80K tokens and hope. Less context, better results. I have seen this repeatedly and it still surprises me.
+
+## What we actually do now
+
+The pipeline changed. Instead of stuffing the whole case file into the prompt, we do a retrieval pass first. Embed every document, chunk by section, index them. When the agent needs to draft something, it queries the index for the relevant chunks — "prior E-2 petition," "RFE response 2024," "current visa status" — and assembles a focused context of maybe 10-15K tokens. The critical facts go at the top. The less critical context goes below.
+
+```
+$ alvva retrieve --case 8847 --query "current visa category"
+  hit: e2_petition_2023.pdf  (score 0.91)
+  hit: cover_letter_e2.pdf   (score 0.84)
+  hit: i94_2024.pdf           (score 0.72)
+  context assembled: 11.4K tokens, 3 sources
+  [critical fields pinned to top]
+```
+
+The E-2 status update now drafts correctly because the E-2 petition is in the first 2K tokens, not buried at position 40K.
+
+I am not claiming retrieval is elegant. It is a brute-force compromise — we cannot give the model real memory, so we give it a good search engine and hope it reads the results. But it works, and the difference between "works" and "does not work" is the difference between a filed form and a rejected one.
+
+## The honest uncertainty
+
+I do not know how long retrieval will be necessary. Model architectures might solve attention distribution. Some papers suggest sparse attention and recurrent memory layers get close. The 2026 model generation is better than the 2025 one, which was better than the 2024 one. The curve is real.
+
+But I am building a product today, for models that exist today, and today the model will forget your client's A-number if you put it in the wrong paragraph. So we retrieve. We chunk. We pin. We test recall at position 30K because that is where the model lies to us.
+
+If your agent has a 200K context window and you think you do not need retrieval, run the position test. Put a critical fact in the middle of a long context. Ask for it back. The result will either confirm your faith or break it, and both outcomes are useful.
