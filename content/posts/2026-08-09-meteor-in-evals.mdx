@@ -1,0 +1,118 @@
+---
+title: "METEOR in Evals: The Metric Everyone Forgets"
+date: "2026-08-09"
+summary: "BLEU is the default eval metric for text generation. It's also broken for anything that isn't a word-for-word copy. METEOR fixes the biggest gaps — stemming, synonyms, fragmentation penalties — and almost nobody uses it. Here's why you should."
+tags: ["evals", "metrics", "llm", "engineering"]
+---
+
+I spent three days last week chasing a regression that wasn't real. Our form-drafting agent was producing I-485 cover letters that were factually correct, well-structured, and semantically equivalent to the reference output. But our eval pipeline said quality dropped 18% overnight.
+
+The culprit was BLEU. The model had started using "lawful permanent resident" instead of "green card holder" — a better formulation, more formal, more appropriate for a USCIS filing. BLEU scored it lower because the n-grams didn't match. The reference said "green card holder," the model said "lawful permanent resident," and the metric punished it for being more correct.
+
+This is the fundamental problem with BLEU and ROUGE. They measure surface overlap. If your model says the same thing with different words — and in real applications, it almost always does — you get penalized. You end up optimizing for plagiarism, not quality.
+
+METEOR fixes this. And almost nobody in the LLM eval world uses it.
+
+## What METEOR actually does
+
+METEOR (Metric for Evaluation of Translation with Explicit ORdering) was published by Banerjee and Lavie in 2005. It was built for machine translation but applies to any text generation task where you compare output to a reference.
+
+The key difference from BLEU: METEOR aligns words through **four matching stages**, each more lenient than the last:
+
+1. **Exact match** — the word is identical. "computer" = "computer."
+2. **Stem match** — the words share a Porter stem. "computers" = "computer," "running" = "run." This catches morphological variation that BLEU misses entirely.
+3. **Synonym match** — the words are synonyms per WordNet. "lawful permanent resident" = "green card holder" (if your synonym dictionary covers it). This is the match that would have saved my three days.
+4. **Paraphrase match** — multi-word phrases that mean the same thing. "filed an application" = "submitted a petition."
+
+Each stage runs sequentially. Exact matches are claimed first, then stems, then synonyms, then paraphrases. Once a word is matched at a higher stage, it's removed from the pool for lower stages. This prevents double-counting.
+
+The result is an F-score that rewards recall over precision — specifically, it uses a weighted harmonic mean with a 9:1 recall-to-precision ratio:
+
+```
+F_mean = (10 * P * R) / (R + 9 * P)
+```
+
+This matters. BLEU is precision-heavy (it asks: what fraction of your n-grams are in the reference?). METEOR is recall-heavy (it asks: what fraction of the reference did you cover?). For most real generation tasks, recall is the better proxy for quality. If the output covers all the key information, minor differences in phrasing shouldn't tank the score.
+
+## The fragmentation penalty
+
+This is the part I find most elegant. METEOR doesn't just count matches — it checks whether they're **contiguous**.
+
+If your output matches 8 words from the reference but they're scattered across the output in 4 separate chunks, that's worse than matching 8 words in 2 chunks. Scattered matches suggest the output grabbed the right vocabulary but assembled it incoherently.
+
+The fragmentation penalty is:
+
+```
+Fragment = 0.5 * (chunks / matches)^3
+```
+
+Where "chunks" is the number of contiguous match groups and "matches" is total matched unigrams. Fewer chunks (more contiguous matches) = lower penalty = higher score.
+
+This catches something BLEU completely misses: an output that has all the right words in all the wrong order. BLEU's n-gram overlap partially catches this (bigrams break), but METEOR's fragmentation is more direct and more interpretable.
+
+The final score:
+
+```
+METEOR = F_mean * (1 - Fragment)
+```
+
+## Why I switched our eval pipeline
+
+After the "lawful permanent resident" incident, I ran METEOR alongside BLEU on our full eval set — 340 form-drafting outputs across I-485, I-130, N-400, and I-765. Three patterns emerged:
+
+**METEOR correlated better with human review.** I had an attorney review 50 samples and rate them pass/fail. METEOR agreed with the attorney 87% of the time. BLEU agreed 71%. The gap was entirely in the "semantically correct but lexically different" bucket — exactly the cases METEOR's stem and synonym matching catches.
+
+**METEOR was less sensitive to reference choice.** With BLEU, changing the reference from "green card holder" to "lawful permanent resident" flipped 12 scores by more than 10 points. With METEOR, the same change moved 3 scores by more than 5 points. This matters because in real evals, your reference is often one of several valid phrasings — you don't want the metric to be a coin flip based on which phrasing you picked.
+
+**METEOR's fragmentation penalty caught structural issues.** Three outputs had high BLEU scores but the attorney flagged them as "disorganized." METEOR's fragmentation penalty caught all three — the matches were scattered, not contiguous. BLEU's n-gram approach missed this because the bigrams still overlapped even when the overall structure was broken.
+
+## When METEOR isn't enough
+
+METEOR is not a silver bullet. I still use it alongside other metrics:
+
+- **BLEU** for surface-level regression detection — if BLEU drops 20 points, something structural changed (formatting, template, output format). METEOR's semantic flexibility can mask these.
+- **BERTScore or embedding similarity** for semantic tasks where synonyms aren't enough — METEOR's WordNet synonyms are finite and sometimes wrong for domain-specific terms. "Adjustment of status" and "AOS" won't match in METEOR unless you add them to the synonym dictionary.
+- **LLM-as-judge** for tasks where "correct" is subjective — legal sufficiency, tone, completeness. No string-matching metric can evaluate whether a cover letter is persuasive.
+
+METEOR also has practical limitations:
+
+- **Language resource dependency.** Stemming and synonyms need language-specific resources. For English it's well-supported. For other languages, you may need to build or find WordNet equivalents.
+- **Single reference is weaker.** METEOR shines with multiple references (it picks the best score per segment). With one reference, you lose the benefit of paraphrase coverage.
+- **No semantic understanding.** METEOR doesn't know that "The applicant entered the US on an E-2 visa" and "The beneficiary arrived on a treaty investor visa" mean the same thing. It matches "entered" to "arrived" as synonyms, but misses the full semantic equivalence. For that, you need embedding-based metrics.
+
+## How to actually use it
+
+If you're in Python, `nltk.translate.meteor_score` works but is slow for large corpora. For production evals:
+
+```python
+from nltk.translate.meteor_score import meteor_score
+
+score = meteor_score(
+    references=["lawful permanent resident"],
+    hypothesis="lawful permanent resident",
+)
+# → 1.0
+
+score = meteor_score(
+    references=["green card holder"],
+    hypothesis="lawful permanent resident",
+)
+# → lower, but not zero — stem/synonym matching catches "resident" ↔ "holder"
+```
+
+For large-scale evals, I wrap it in a multiprocessing pool and cache the WordNet lookups. It's ~10x slower than BLEU but worth it for the signal quality.
+
+The practical setup I use:
+
+- Run BLEU + METEOR + BERTScore on every eval
+- Flag regressions only when **all three** drop more than threshold
+- If only BLEU drops but METEOR and BERTScore hold, it's a lexical shift, not a quality regression
+- If METEOR and BERTScore drop but BLEU holds, it's a semantic regression masked by surface overlap — the worst kind
+
+## The takeaway
+
+BLEU was designed in 2002 for statistical machine translation, where outputs were close to word-for-word rearrangements of the reference. LLMs don't work that way. They paraphrase, they restructure, they use synonyms and different word forms. A metric that only sees exact n-gram overlap is measuring the wrong thing.
+
+METEOR was built to fix exactly this. It was published 20 years ago. It correlates better with human judgment. It's implemented in every major NLP library. And in my experience, almost no one building LLM evals uses it.
+
+If you're evaluating text generation and you're only using BLEU or ROUGE, you're flying blind to paraphrase. Add METEOR. Your eval signal gets sharper immediately.
