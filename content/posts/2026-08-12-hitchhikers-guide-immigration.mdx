@@ -1,0 +1,94 @@
+---
+title: "A Hitchhiker’s Guide to Healthcare Software"
+date: "2026-08-12"
+summary: "What a depressed dolphin, a paranoid android, and 42 have to do with building risk adjustment in healthcare. The absurd parallels between Douglas Adams’ universe and what we shipped at Foresee Health."
+tags: ["founder-notes", "healthcare", "software", "culture"]
+---
+
+The night before we sold Foresee Health, I pulled my copy of *The Hitchhiker’s Guide to the Galaxy* off the shelf. It fell open to page 62—the Vogon poetry scene. I read it three times while the due diligence team reviewed our audit logs.
+
+Adams wrote the Guide as a device—a book within a book. It’s a travel guide for a galaxy that doesn’t make sense, built by beings who gave up trying to make it make sense. Last month, I printed the HCC risk adjustment guidelines. Sixty-four pages of hierarchical condition categories, cross‑references to ICD‑10 codes that map to other codes, footnotes that contradict the CMS addendums. It reads like Vogon bureaucracy endorsed by the Centers for Medicare & Medicaid Services.
+
+We weren’t building a form filler. We were building a *Guide*.
+
+---
+
+### The Babel Fish Problem
+
+In Adams’ universe, the Babel fish is a small yellow leech-like creature you stick in your ear. It translates any language instantly. Perfect communication. The catch? It proved God doesn’t exist, because if He did, He’d have made everything clear from the start.
+
+Healthcare billing is a Babel fish problem turned inside out. Every term—*chronic kidney disease stage 3*, *major depression single episode*, *type 2 diabetes with peripheral neuropathy*—has six definitions depending on which coding manual you’re using, which auditor reviewed last quarter, and which health plan’s contract you’re under.
+
+Our first prototype translated “heart failure” into clean hierarchical risk scores. It worked on the training set. Real patients? A 3‑year‑old with congenital cardiomyopathy broke it. An 80‑year‑old with diastolic dysfunction and normal ejection fraction broke it harder.
+
+The Guide had an entry for this: **“Mostly harmless.”** Our annotation: *When a system works until it doesn’t, and you won’t know which until a patient gets the wrong treatment.*
+
+---
+
+### Don’t Panic
+
+The Guide’s cover famously reads “**DON’T PANIC**” in large friendly letters. Our clinical dashboard had the same text in the header, in the same shade of calming blue (#4A90E2). It showed when a patient’s risk score didn’t match their actual health status.
+
+Panic is the default state in healthcare. Nurses panic when a vital sign trends red. Doctors panic when a prior-auth gets denied. We panicked when a data feed from Epic went silent at 2 AM. The friendly letters weren’t decoration—they were an instruction. Breathe. Check the logs. The answer is usually in the data, not the drama.
+
+Last Tuesday, a feed did fail. CMS changed the JSON schema without warning. Our system flagged it, retried twice, then escalated to a human. No panic. Just: “HTTP 400. Retry in 90s.” The Guide would approve.
+
+---
+
+### The Answer Is 42
+
+Deep Thought spent 7.5 million years computing the Answer to Life, the Universe, and Everything. It came back with “42.” Everyone was upset because they’d forgotten the question.
+
+We got feature requests that felt like that. “Can the AI predict hospital readmission risk?” Sure. The model would spit out a number—78.2%. Clinicians would treat it as gospel. Administrators would treat it as nonsense. The real question wasn’t “What’s the chance?” It was “What specific intervention prevents the readmission, and how do we deploy it by Thursday?”
+
+We built the prediction endpoint anyway. It returned 42 when confidence was low. It was our inside joke—a reminder that without the right question, any answer is noise.
+
+---
+
+### Marvin the Paranoid Android
+
+Marvin has a brain the size of a planet, and he’s bored. He’s depressed by the futility of existence, annoyed by the trivial problems he’s asked to solve.
+
+Our risk adjustment models sometimes felt like Marvin. They could parse a 300‑page medical record in seconds, extract diagnoses, medications, contraindications. Then we asked them to output HCC‑RAF scores in the exact decimal format Medicare required, and they sighed in floating‑point precision.
+
+The trick was giving Marvin something interesting to do. We started feeding the model edge cases—rare genetic disorders with ten‑letter names, comorbid conditions from different coding chapters, handwritten physician notes scanned from 1995. The attention scores perked up. Less boredom, more engagement.
+
+Even AI doesn’t want to do busywork.
+
+---
+
+### Towel = Preparedness
+
+In the Guide, a towel is the most useful thing an interstellar hitchhiker can carry. It has practical uses (drying, warmth, signaling) and psychological ones—someone with a towel is *prepared*.
+
+Our “towel” was the audit trail. Every prediction—every risk score, every flag for missing documentation, every override by a human clinician—got logged with a hash, timestamp, and actor ID. It was boring infrastructure. It was also what let us prove to an auditor that yes, the patient did have stage‑4 CKD documented, and yes, the system did catch the conflicting Lasix prescription.
+
+Without the towel, you’re just guessing. With it, you’re prepared for the CMS auditor who asks, “How do you justify this HCC‑189?”
+
+---
+
+### So Long, and Thanks for All the Fish
+
+At the end of the first book, dolphins leave Earth with that message. They figured out the planet was about to be demolished and booked it.
+
+Sometimes I looked at the legacy healthcare software—the mainframe systems from 1985, the Access databases physicians kept “just in case,” the HL7 messages that required fax confirmations—and thought the dolphins had the right idea. Why keep patching systems that should’ve been retired a decade ago?
+
+Then a prediction worked. A patient got flagged for a wellness visit they needed. A health plan saved $14K on avoidable complications. The dolphins were wrong. You don’t leave when things get hard. You build a better boat.
+
+That’s why we sold Foresee Health to PE instead of shutting it down—so someone else could keep sailing.
+
+---
+
+### Try It Tonight
+
+If you’re building something that feels like Vogon bureaucracy—healthcare, finance, government—go read Adams again. Not for the jokes. For the framing.
+
+1. **Build a Guide, not a manual.** Help users navigate nonsense without pretending it makes sense.
+2. **Put DON’T PANIC where they’ll see it.** Errors should calm, not escalate.
+3. **Log everything.** Your towel is your audit trail.
+4. **Find the real question behind “42.”** Stakeholders ask for predictions; they need interventions.
+5. **Give Marvin hard problems.** Bored models make sloppy mistakes.
+
+The Galaxy is mostly harmless. Your code doesn’t have to be.
+
+— Eshwar
