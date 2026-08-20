@@ -1,0 +1,60 @@
+[
+  {
+    "post_path": "content/posts/2026-08-17-fine-tune-llama-3.2-on-custom-data-complete-walkthrough.mdx",
+    "title": "Fine-Tune Llama 3.2 on Custom Data: Complete Walkthrough",
+    "evaluations": {
+      "factual_accuracy": {
+        "score": 8.5,
+        "issues": [],
+        "recommendation": "OK"
+      },
+      "originality": {
+        "score": 4.666666666666667,
+        "issues": [
+          "Topic overlap with recent posts"
+        ],
+        "recommendation": "Choose more distinct topic"
+      },
+      "learning_value": {
+        "score": 5.0,
+        "issues": [
+          "Add more actionable content"
+        ],
+        "recommendation": "Add code example or debugging story"
+      },
+      "author_growth": {
+        "score": 5.0,
+        "issues": [
+          "Add more personal debugging experience"
+        ],
+        "recommendation": "Include a personal debugging story"
+      },
+      "voice_authenticity": {
+        "score": 7.0,
+        "issues": [],
+        "recommendation": "Authentic voice"
+      },
+      "actionability": {
+        "score": 7.0,
+        "issues": [],
+        "recommendation": "Good actionability"
+      }
+    },
+    "total_score": 6.1944444444444455,
+    "passes_threshold": false,
+    "issues": [
+      "originality: Topic overlap with recent posts",
+      "learning_value: Add more actionable content",
+      "author_growth: Add more personal debugging experience"
+    ],
+    "recommendations": [
+      "OK",
+      "Choose more distinct topic",
+      "Add code example or debugging story",
+      "Include a personal debugging story",
+      "Authentic voice",
+      "Good actionability"
+    ],
+    "timestamp": "2026-08-17T14:31:33.524717"
+  }
+]
