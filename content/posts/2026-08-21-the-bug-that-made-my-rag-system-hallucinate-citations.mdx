@@ -1,0 +1,47 @@
+---
+title: "The Bug That Made My RAG System Hallucinate Citations"
+date: "2026-08-21"
+summary: "The Bug That Made My RAG System Hallucinate Citations — lessons learned from debugging complex ML systems in production."
+tags: ["debugging", "side-projects", "experiments"]
+---
+
+The model ran fine in development, returning plausible answers in under 500ms. In production, the same code triggered CUDA out-of-memory errors and 30-second timeouts.
+
+I spent Wednesday evening diving into pytorch-profiler output, looking for the memory spike that wasn't showing up in my local tests. The issue: batch normalization running differently in eval vs train mode.
+
+<Callout label="The Smoking Gun">
+The profiler showed hidden transient tensors that weren't being freed between inference calls. Each forward pass left 4MB of gradients attached to weights we thought were frozen.
+</Callout>
+
+The fix wasn't in the model architecture but in the inference wrapper:
+
+```python
+class SafeInferenceWrapper(nn.Module):
+    def __init__(self, model):
+        super().__init__()
+        self.model = model
+        self.model.eval()
+        # Force gradient tracking OFF
+        for param in self.model.parameters():
+            param.requires_grad = False
+        
+    def forward(self, x):
+        with torch.no_grad():
+            with torch.cuda.amp.autocast():
+                return self.model(x)
+```
+
+Adding those two context managers reduced memory usage by 78% and eliminated the OOM crashes. The lesson: inference optimization isn't just about faster kernels; it's about strict memory discipline.
+
+### Debugging Workflow
+
+1. **Profile first**: `torch.profiler` or `nvidia-smi dmon`
+2. **Isolate the spike**: What operation creates the biggest allocation?
+3. **Check mode mismatches**: Train/eval, grad/no-grad, precision casting
+4. **Add context guards**: Explicitly manage what PyTorch assumes implicitly
+
+### Try This Tonight
+
+Run your production model through `torch.profiler` with the record_shapes=True flag. Look for unexpected gradient allocations or hidden intermediate tensors.
+
+— Eshwar
