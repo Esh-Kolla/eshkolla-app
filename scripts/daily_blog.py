@@ -26,7 +26,27 @@ def run_cmd(cmd, cwd=None, check=True):
     result = subprocess.run(cmd, shell=True, cwd=cwd, capture_output=True, text=True)
     if result.returncode != 0 and check:
         print(f"ERROR: {result.stderr}")
-        raise subprocess.CalledProcessError(result.returncode, cmd)
+        # Don't crash on grep/git failures - recover gracefully
+        if 'grep' in cmd.lower():
+            print(f"WARNING: grep failed, continuing with empty tags")
+            return subprocess.CompletedProcess(cmd, 0, stdout='', stderr='')
+        elif 'git add' in cmd.lower():
+            # Try simpler git add using relative paths
+            try:
+                # Extract file path from command
+                import re
+                match = re.search(r'git add\s+(.+)', cmd)
+                if match:
+                    file_path = match.group(1).strip()
+                    # Use safer git add with quoted path
+                    safe_cmd = f'git add \"{file_path}\"'
+                    print(f"Retrying with safe command: {safe_cmd}")
+                    result = subprocess.run(safe_cmd, shell=True, cwd=cwd, capture_output=True, text=True)
+                    if result.returncode == 0:
+                        return result
+            except:
+                pass
+        raise Exception(f"Command failed: {cmd}")
     return result
 
 def git_update():
