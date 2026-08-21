@@ -88,11 +88,19 @@ def select_topic(recent_tags):
     series_topic = check_roadmap()
     if series_topic:
         print(f"Series post: {series_topic}")
+        # Sanitize slug for series topics too
+        slug = series_topic.lower().replace(' ', '-')
+        for char in '()[]{}<>:,"\'`!@#$%^&*+=|\\/~':
+            slug = slug.replace(char, '')
+        while '--' in slug:
+            slug = slug.replace('--', '-')
+        slug = slug.strip('-')
+        
         return {
             "type": "series",
             "category": "series",  # Mark as series for content generation
             "topic": series_topic,
-            "slug": series_topic.lower().replace(' ', '-').replace(':', ''),
+            "slug": slug,
             "tags": ["ml-from-scratch", series_topic.split(':')[0].lower() if ':' in series_topic else "optimization", "math"]
         }
     
@@ -166,7 +174,17 @@ def select_topic(recent_tags):
         ]
     
     topic = random.choice(topics)
-    slug = topic.lower().replace(' ', '-').replace(':', '').replace(',', '')
+    # Sanitize filename: remove all shell special characters
+    slug = topic.lower()
+    slug = slug.replace(' ', '-')
+    # Remove all problematic characters for shell and filesystem
+    for char in '()[]{}<>:,"\'`!@#$%^&*+=|\\/~':
+        slug = slug.replace(char, '')
+    # Also remove multiple consecutive hyphens
+    while '--' in slug:
+        slug = slug.replace('--', '-')
+    # Remove leading/trailing hyphens
+    slug = slug.strip('-')
     
     return {
         "type": "regular",
