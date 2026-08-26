@@ -1,0 +1,42 @@
+---
+title: "Evaluation Metrics That Don't Lie"
+date: "2026-08-26"
+summary: "Evaluation Metrics That Don't Lie — explaining core concepts with practical implementation examples."
+tags: ["machine-learning", "deep-learning", "llm", "agents"]
+---
+
+Evaluation Metrics That Don't Lie seems abstract until you implement it. I spent Friday night building a minimal working example and discovered three edge cases the textbook doesn't mention.
+
+<Callout label="The Hidden Complexity">
+Our model scored 94% accuracy but users reported it was unusable. The metric was cheating—it averaged over easy examples while failing on the hard ones that mattered to users.
+</Callout>
+
+The solution involved understanding the actual constraints, not just the theoretical ones. Benchmarks often optimize for one metric while ignoring others that matter in production.
+
+### Implementation Pattern
+
+Here's the core implementation pattern:
+
+```python
+def implement_concept(input_data):
+    # Step 1: Preprocess according to constraints
+    processed = preprocess_with_constraints(input_data)
+    
+    # Step 2: Apply the core transformation
+    transformed = apply_core_transformation(processed)
+    
+    # Step 3: Validate against edge cases  
+    validated = validate_against_edge_cases(transformed)
+    
+    return validated
+```
+
+Each step has pitfalls that only show up when you run real data through it.
+
+### Try This Tonight
+
+Split your test set by difficulty (easy/medium/hard) using prediction confidence scores. Report performance separately for each bucket.
+
+Comparing theoretical understanding with practical implementation reveals the gap between what papers claim and what actually works in deployment.
+
+— Eshwar
