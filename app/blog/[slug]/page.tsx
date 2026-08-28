@@ -9,6 +9,7 @@ import Terminal from "@/components/charts/terminal";
 import Callout from "@/components/charts/callout";
 import PipelineDiagram from "@/components/charts/pipeline-diagram";
 import GradientDescentChart from "@/components/charts/gradient-descent-chart";
+import PerceptronChart from "@/components/charts/perceptron-chart";
 import ReadingProgress from "@/components/reading-progress";
 import TableOfContents from "@/components/table-of-contents";
 import RelatedPosts from "@/components/related-posts";
@@ -111,7 +112,7 @@ export default async function PostPage({
       <TableOfContents />
 
       <div className="prose-terminal">
-        <MDXRemote source={post.content} components={{ BarChart, Chart, InferenceChart, FlowDiagram, Terminal, Callout, PipelineDiagram, GradientDescentChart }} />
+        <MDXRemote source={post.content} components={{ BarChart, Chart, InferenceChart, FlowDiagram, Terminal, Callout, PipelineDiagram, GradientDescentChart, PerceptronChart }} />
       </div>
 
       <RelatedPosts currentSlug={slug} currentTags={post.tags} />

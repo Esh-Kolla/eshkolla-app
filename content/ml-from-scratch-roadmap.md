@@ -13,7 +13,7 @@ implementation, make the reader watch it converge, end with "try it tonight".
 
 ## Roadmap (in order)
 1. [x] Gradient descent (linear regression) — 2026-08-08 — GradientDescentChart
-2. [ ] Perceptron — binary classification, the decision boundary learning live
+2. [x] Perceptron — binary classification, the decision boundary learning live — 2026-08-27 — PerceptronChart
 3. [ ] Logistic regression — sigmoid, cross-entropy loss, probability outputs
 4. [ ] K-means clustering — centroids drifting to cluster centers
 5. [ ] PCA — variance maximization, projecting 2D to 1D
